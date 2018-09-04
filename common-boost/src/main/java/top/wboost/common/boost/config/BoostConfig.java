@@ -1,21 +1,20 @@
 package top.wboost.common.boost.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-
 import top.wboost.common.base.annotation.AutoWebApplicationConfig;
 import top.wboost.common.boost.handler.BoostHandlerAdapter;
 import top.wboost.common.boost.handler.BoostUrlHandlerMapping;
 import top.wboost.common.system.spring.converter.ParamMethodArgumentResolver;
 import top.wboost.common.utils.web.interfaces.context.EzWebApplicationListener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 快速生成接口配置项
