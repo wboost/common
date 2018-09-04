@@ -1,12 +1,9 @@
 package top.wboost.common.base.service.impl;
 
-import java.util.Map;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
-
 import top.wboost.common.base.annotation.AutoRootApplicationConfig;
 import top.wboost.common.base.repository.BaseRepository;
 import top.wboost.common.log.entity.Logger;
@@ -16,6 +13,8 @@ import top.wboost.common.system.exception.SystemException;
 import top.wboost.common.utils.web.interfaces.context.EzApplicationListener;
 import top.wboost.common.utils.web.utils.AopUtils;
 import top.wboost.common.utils.web.utils.SpringBeanUtil;
+
+import java.util.Map;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @AutoRootApplicationConfig

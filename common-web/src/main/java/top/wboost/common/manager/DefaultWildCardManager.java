@@ -1,13 +1,13 @@
 package top.wboost.common.manager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import top.wboost.common.base.interfaces.Warpper;
 import top.wboost.common.system.exception.SystemException;
 import top.wboost.common.util.Checker;
 import top.wboost.common.util.StringUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 通配符统一为 ${-{ 内容{要替换的}内容  }-}$或 {要替换的}
@@ -72,5 +72,9 @@ public class DefaultWildCardManager implements WildCardManager {
             }
         }
         return text;
+    }
+
+    public Warpper<String> getWarpper() {
+        return this.warp;
     }
 }

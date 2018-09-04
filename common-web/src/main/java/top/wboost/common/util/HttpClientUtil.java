@@ -30,6 +30,7 @@ import top.wboost.common.base.enums.CharsetEnum;
 import top.wboost.common.log.util.LoggerUtil;
 import top.wboost.common.system.exception.ConnectionException;
 import top.wboost.common.utils.web.utils.FileUtil;
+import top.wboost.common.utils.web.utils.PropertiesUtil;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -45,15 +46,20 @@ import java.net.UnknownHostException;
 public class HttpClientUtil {
 
     // 最大连接数
-    public final static int MAX_TOTAL_CONNECTIONS = 100;
+    public final static int MAX_TOTAL_CONNECTIONS = Integer
+            .parseInt(PropertiesUtil.getPropertyOrDefault("common.util.httpClientUtil.MAX_TOTAL_CONNECTIONS", "100"));
     // 获取连接的最大等待时间
-    public final static int WAIT_TIMEOUT = 30000;// 30s
+    public final static int WAIT_TIMEOUT = Integer
+            .parseInt(PropertiesUtil.getPropertyOrDefault("common.util.httpClientUtil.WAIT_TIMEOUT", "30000"));// 30s
     // 每个路由最大连接数
-    public final static int MAX_ROUTE_CONNECTIONS = 50;
+    public final static int MAX_ROUTE_CONNECTIONS = Integer
+            .parseInt(PropertiesUtil.getPropertyOrDefault("common.util.httpClientUtil.MAX_ROUTE_CONNECTIONS", "50"));
     // 连接超时时间
-    public final static int CONNECT_TIMEOUT = 10000;// 10s
+    public final static int CONNECT_TIMEOUT = Integer
+            .parseInt(PropertiesUtil.getPropertyOrDefault("common.util.httpClientUtil.CONNECT_TIMEOUT", "10000"));// 10s
     // 读取超时时间
-    public final static int READ_TIMEOUT = 10000;// 10s
+    public final static int READ_TIMEOUT = Integer
+            .parseInt(PropertiesUtil.getPropertyOrDefault("common.util.httpClientUtil.READ_TIMEOUT", "10000"));// 10s
     //允许跳转
     public final static boolean REDIRECTS_ENABLED = true;
     //连接池
