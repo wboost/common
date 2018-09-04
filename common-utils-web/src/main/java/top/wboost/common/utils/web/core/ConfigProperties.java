@@ -1,10 +1,5 @@
 package top.wboost.common.utils.web.core;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -20,7 +15,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.context.support.StandardServletEnvironment;
-
 import top.wboost.common.base.ConfigForBase;
 import top.wboost.common.base.enums.CharsetEnum;
 import top.wboost.common.log.entity.Logger;
@@ -29,17 +23,24 @@ import top.wboost.common.util.StringUtil;
 import top.wboost.common.utils.web.interfaces.context.EzRootApplicationListener;
 import top.wboost.common.utils.web.utils.PropertiesUtil;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 配置文件 工具类
  * <pre>
  * 扫描本框架默认配置文件并注入context中
  * 优先级高于xml文件&{}扫描与@Value扫描并提供转换支持
- * 若开发者不使用&ltcontext:property-placeholder/&gt标签
+ * 若开发者不使用&lt context:property-placeholder/&gt标签
  * 则将自动注册{@link PropertySourcesPlaceholderConfigurer}
  * 并启动扫描
- * 最佳支持版本：spring-4.3.13.RELEASE,spring-boot-1.5.9.RELEASE
+ * 可在properties/config.properties 配置文件中配置 sys.properties 配置项来增加需要扫描的配置文件
  * </pre>
- * 
+ * <pre>
+ *     最佳支持版本：spring-4.3.13.RELEASE,spring-boot-1.5.9.RELEASE
+ * </pre>
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  * @author jwSun
  * @date 2017年3月4日 上午10:02:27
@@ -47,19 +48,18 @@ import top.wboost.common.utils.web.utils.PropertiesUtil;
 public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor */BeanDefinitionRegistryPostProcessor,
         EzRootApplicationListener, EnvironmentAware, EmbeddedValueResolverAware {
 
-    private static Logger log = LoggerUtil.getLogger(PropertiesUtil.class);
-
-    private Environment environment;
-    public static StandardServletEnvironment localenv = new StandardServletEnvironment();
-    public static StringValueResolver resolver = null;
     public static final String DEFAULT_PROPERTIES = "classpath*:properties/common-default.properties";
     public static final String SYS_PROPERTIES_SCAN = "classpath*:sys/properties/*.properties";
     public static final String SYS2_PROPERTIES_SCAN = "classpath*:sys.properties/*.properties";
     public static final String DEFAULT_PROPERTIES_SCAN = "classpath:properties/*.properties";
     public static final String DEFAULT_CONFIG_FILE = "classpath:properties/config.properties";
     public static final String DEFAULT_CONFIG_NAME = "sys.properties";
+    public static StandardServletEnvironment localenv = new StandardServletEnvironment();
+    public static StringValueResolver resolver = null;
+    private static Logger log = LoggerUtil.getLogger(PropertiesUtil.class);
     private static Set<String> ADD_PROP = new HashSet<>();
     private static PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+    private static boolean initRootPropertiesConfig = false;
 
     static {
         String location = PropertiesUtil.getProperty(DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_FILE);
@@ -82,6 +82,8 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
             }
         });
     }
+
+    private Environment environment;
 
     private PropertySourcesPlaceholderConfigurer configPropertySourcesPlaceholderConfigurer(
             ConfigurableListableBeanFactory beanFactory) {
@@ -146,8 +148,6 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
             }
         });
     }
-
-    private static boolean initRootPropertiesConfig = false;
 
     @Override
     public void onRootApplicationEvent(ContextRefreshedEvent event) {

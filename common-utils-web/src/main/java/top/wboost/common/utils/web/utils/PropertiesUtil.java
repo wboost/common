@@ -1,27 +1,21 @@
 package top.wboost.common.utils.web.utils;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-
 import top.wboost.common.base.enums.CharsetEnum;
 import top.wboost.common.exception.BusinessException;
 import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.util.LoggerUtil;
 import top.wboost.common.util.StringUtil;
 import top.wboost.common.utils.web.core.ConfigProperties;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class PropertiesUtil {
 
@@ -57,6 +51,9 @@ public class PropertiesUtil {
                                 CharsetEnum.UTF_8.getCharset());
                 } else {
                     val = ConfigProperties.localenv.getProperty(name, defaultVal);
+                }
+                if (("${" + name + "}").equals(val)) {
+                    val = null;
                 }
             } else {
                 try {
