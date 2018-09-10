@@ -95,8 +95,6 @@ public class PropertiesUtil {
     /**
      * 获得指定前缀的集合
      * @param prefix 前缀
-     * @return
-     * @throws Exception
      */
     public static Map<String, Object> getPropertiesByPrefix(String prefix) {
         Map<String, Object> retMap = new HashMap<>();
@@ -108,8 +106,7 @@ public class PropertiesUtil {
         return retMap;
     }
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> getAllProperties() {
+    public static Map<String, Object> getAllProperties() {
         Map<String, Object> retMap = new HashMap<>();
         Iterator<org.springframework.core.env.PropertySource<?>> ite = ConfigProperties.localenv.getPropertySources()
                 .iterator();
