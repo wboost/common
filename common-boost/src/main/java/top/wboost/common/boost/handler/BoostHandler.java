@@ -1,9 +1,10 @@
 package top.wboost.common.boost.handler;
 
+import org.springframework.web.servlet.ModelAndView;
+import top.wboost.common.annotation.Explain;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
 
 public interface BoostHandler {
 
@@ -13,6 +14,7 @@ public interface BoostHandler {
      * @param response
      * @return
      */
+    @Explain(value = "boost")
     public ModelAndView handle(HttpServletRequest request, HttpServletResponse response);
 
     /**
