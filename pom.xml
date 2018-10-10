@@ -230,14 +230,14 @@
 				<snapshotRepository>
 					<id>nexus2</id>
 					<name>common-manager</name>
-					<url>http://192.168.16.181:8081/repository/chinaoly/</url>
+					<url>http://freeboy.iok.la:8081/repository/chinaoly/</url>
 					<uniqueVersion>true</uniqueVersion>
 				</snapshotRepository>
 		
 				<repository>
 					<id>nexus2</id>
 					<name>User Porject Release</name>
-					<url>http://192.168.16.181:8081/repository/chinaoly/</url>
+					<url>http://freeboy.iok.la:8081/repository/chinaoly/</url>
 				</repository>
 			</distributionManagement>
         </profile>
@@ -305,6 +305,8 @@
 			      </plugin>
 			</plugins>
 		</pluginManagement>
+
+
 	</build>
 
 </project>
