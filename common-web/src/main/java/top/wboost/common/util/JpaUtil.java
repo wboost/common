@@ -1,16 +1,15 @@
 package top.wboost.common.util;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.apache.commons.lang.ArrayUtils;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.orm.jpa.EntityManagerFactoryInfo;
+import top.wboost.common.annotation.QueryByBetween;
+import top.wboost.common.annotation.QueryByEquals;
+import top.wboost.common.annotation.QueryByLike;
+import top.wboost.common.log.entity.Logger;
+import top.wboost.common.log.util.LoggerUtil;
+import top.wboost.common.utils.web.utils.PropertiesUtil;
+import top.wboost.common.utils.web.utils.SpringBeanUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,18 +19,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.sql.DataSource;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.orm.jpa.EntityManagerFactoryInfo;
-
-import top.wboost.common.annotation.QueryByBetween;
-import top.wboost.common.annotation.QueryByEquals;
-import top.wboost.common.annotation.QueryByLike;
-import top.wboost.common.log.entity.Logger;
-import top.wboost.common.log.util.LoggerUtil;
-import top.wboost.common.utils.web.utils.PropertiesUtil;
-import top.wboost.common.utils.web.utils.SpringBeanUtil;
+import java.lang.reflect.Field;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  * spring data jpa工具类
@@ -43,11 +34,11 @@ import top.wboost.common.utils.web.utils.SpringBeanUtil;
 @SuppressWarnings("deprecation")
 public class JpaUtil {
 
-    public static EntityManagerFactory entityManagerFactory = null;
     public static final String dataSource = PropertiesUtil.getProperty("import.jdbc.util") + "."
             + PropertiesUtil.getProperty("import.dataSource");
-    private static Logger log = LoggerUtil.getLogger(JpaUtil.class);
+    public static EntityManagerFactory entityManagerFactory = null;
     public static DataSource dataSourceImpl = null;
+    private static Logger log = LoggerUtil.getLogger(JpaUtil.class);
 
     static {
         org.springframework.orm.jpa.JpaTransactionManager JpaTransactionManager = (org.springframework.orm.jpa.JpaTransactionManager) SpringBeanUtil
@@ -119,6 +110,44 @@ public class JpaUtil {
                 list.add(obj);
             }
             rs.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }
+        return objecArraytList;
+    }
+
+    public static List<Map<String, Object>> executeByJdbcModel(String sql) {
+        List<Map<String, Object>> objecArraytList = null;
+        Connection connection = null;
+        try {
+            connection = dataSourceImpl.getConnection();
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            objecArraytList = new ArrayList<>();
+            @SuppressWarnings("unchecked")
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int cols_len = metaData.getColumnCount();
+            while (resultSet.next()) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                for (int i = 0; i < cols_len; i++) {
+                    String cols_name = metaData.getColumnName(i + 1);
+                    Object cols_value = resultSet.getObject(cols_name);
+                    if (cols_value == null) {
+                        cols_value = "";
+                    }
+                    map.put(cols_name, cols_value);
+                }
+                objecArraytList.add(map);
+            }
+            resultSet.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
         } finally {
