@@ -5,7 +5,7 @@
 	  <parent>
 	    <groupId>top.wboost</groupId>
 	    <artifactId>common</artifactId>
-		  <version>3.1.2.RELEASE</version>
+		  <version>3.1.3.RELEASE</version>
 	  </parent>
 	  
 	<dependencies>
@@ -14,18 +14,6 @@
 			<groupId>${project-group-id}</groupId>
 			<version>${project-group-version}</version>
 			<exclusions>
-				<exclusion>
-					<artifactId>javax.servlet</artifactId>
-					<groupId>org.glassfish</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jstl</artifactId>
-					<groupId>javax.servlet</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>javax.servlet.jsp</artifactId>
-					<groupId>org.glassfish</groupId>
-				</exclusion>
 				<exclusion>
 					<artifactId>hibernate-core</artifactId>
 					<groupId>org.hibernate</groupId>
