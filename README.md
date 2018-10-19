@@ -1,5 +1,16 @@
-文档完善中。。。
 
+快速开发集成包
+=========================
+[![Packagist](http://www.wboost.top/svg/version-3.1.3.RELEASE-brightgreen.svg)](http://www.wboost.top)
+
+dependency
+------------
+[![Packagist](http://www.wboost.top/svg/spring-4.3.13.RELEASE-brightgreen.svg)](http://www.wboost.top)    [![Packagist](http://www.wboost.top/svg/springboot-1.5.9.RELEASE-brightgreen.svg)](http://www.wboost.top)   ![Packagist](http://www.wboost.top/svg/hibernate-5.0.12.Final-brightgreen.svg)
+
+
+[Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs).
+
+#文档待完善
 |common:通用管理项目
 
 //基础包
