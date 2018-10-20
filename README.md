@@ -1,52 +1,130 @@
 
 快速开发集成包
 =========================
+
+[Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs)
+------
 [![Packagist](http://www.wboost.top/svg/version-3.1.3.RELEASE-brightgreen.svg)](http://www.wboost.top)
 
-dependency
-------------
 [![Packagist](http://www.wboost.top/svg/spring-4.3.13.RELEASE-brightgreen.svg)](http://www.wboost.top)    [![Packagist](http://www.wboost.top/svg/springboot-1.5.9.RELEASE-brightgreen.svg)](http://www.wboost.top)   ![Packagist](http://www.wboost.top/svg/hibernate-5.0.12.Final-brightgreen.svg)
+------
+> ### 引入说明
+- [支持传统web架构项目与springboot项目无缝切换](#传统web架构项目与springboot项目切换)
+- [统一参数验证机制，可复用，自由规则](#统一参数验证机制，可复用，自由规则)
+- 统一配置文件初始化机制
+- 自定义接收参数转换器
+- @AutoRootApplicationConfig,@AutoWebApplicationConfig > 扫描注解分离不同上下文(ROOT/WEB)且不与spring冲突
+- @AutoProxy > 代理类注册功能 
+- 统一返回值及异常处理，接口文档
+- es/kylin/sql等工具类
+- 敏捷开发
+- 搭配[spring-boot-starter-support](http://192.168.1.244/jcpt/SPRING-BOOT-STARTER-SUPPORT) 更佳
 
 
-[Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs).
+------------
+#### 传统web架构项目与springboot项目切换
 
-#文档待完善
-|common:通用管理项目
+```
+<properties>
+<tools-group-id>top.wboost</tools-group-id>
+<tools-group-version>3.1.2.RELEASE</tools-group-version>
+</properties>
+```
+##### 根据项目类型引入
+- 传统web
+```
+<dependency>
+    <groupId>${tools-group-id}</groupId>
+    <version>${tools-group-version}</version>
+    <artifactId>common-boost</artifactId>
+</dependency>
+```
+- springboot 
+```
+<dependency>
+    <groupId>${tools-group-id}</groupId>
+    <version>${tools-group-version}</version>
+    <artifactId>common-boot</artifactId>
+</dependency>
+```
+boot项目自动扫描top.wboost.common,com.chinaoly及SpringApplication类下目录
 
-//基础包
-|+common-base:项目基础包
-|+common-exception:通用异常包
-|+common-log:通用日志包
-|+common-utils:通用工具类包
-|+common-utils-web:通用web项目处理工具类
-|+common-utils-web:通用web项目整合
+------------
+#### 统一参数验证机制，可复用，自由规则
+默认提供@NotNull(不能为空)与@NotEmpty(不能为空且不能为空字符串)注解
+- 新建校验注解文件LowerThan,注解上增加@top.wboost.common.annotation.parameter.ParameterConfig
+```
+// Integer、Long小于指定数据校验实例
+@Target({ ElementType.PARAMETER })
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@ParameterConfig
+public @interface LowerThan {
+    int value();
+}
+```
+- 新建校验器LowerThanChecker类,并注入ioc（@AutoWebApplicationConfig）,且实现top.wboost.common.annotation.parameter.ParameterConfigChecker接口
 
-//spring-boot相关
-|+common-boot:spring-boot快速整合配置包
-|+common-spring-boot-starter:常用操作自动配置包
-|++common-base-spring-boot-starter:常用操作自动配置基础包
-|++common-datasource-spring-boot-starter:多数据源自动注册配置包
-|++common-mybatis-spring-boot-starter:集成mybatis/tkmapper/pagehelper多数据源自动配置包
+```
+@AutoWebApplicationConfig
+public class LowerThanChecker implements ParameterConfigChecker {
 
-//大数据组件调用相关
-|+common-kylin:通用kylin查询处理包
-|++commonl-kylin-support-repository:仿jpa注册接口快速sql查询kylin包
+    @Override
+    public Boolean check(Object source, Object... argName) {
+        return true;
+    }
 
-|+common-es:通用ElasticSearch查询处理包
-|++common-es-tools v1.4.2:通用es处理包V1.4.2版本
-|++common-es-tools v2.4.1:通用es处理包V2.4.1版本
+    private void throwException(String argName, int big) {
+        SystemCodeException e = new SystemCodeException(SystemCode.PROMPT);
+        e.setPromptMessage(argName + "参数值不能大于" + big);
+        throw e;
+    }
 
-//常用工具整合包
-|+common-sql:java代码生成sql语句包
-|+common-netty:netty处理包
+    // 验证方法 source:参数 annotation:注解 args: 参数名
+    @Override
+    public Boolean check(Object source, Annotation annotation, Object... args) {
+        LowerThan lowerThan = (LowerThan) annotation;
+        if (source instanceof Integer) {
+            int param = (int) source;
+            if (param > lowerThan.value()) {
+                throwException(args[0].toString(), lowerThan.value());
+            }
+        }
+        return true;
+    }
 
-|+common-message-queue:消息队列处理包
-|++common-message-queue-activemq:activemq消息队列处理包
-|++common-message-queue-redis:redis消息队列处理包
+    //校验器对应注解
+    @Override
+    public Class<? extends Annotation> getAnnotation() {
+        return LowerThan.class;
+    }
 
-|+common-map-geohash:地图参数处理包(转)
+}
+```
+- 使用
+```
+@GetMapping("/example")
+@Explain(systemCode = SystemCode.DO_FAIL, value = "example")
+public ResultEntity callTimeResult(
+        @ApiParam(required = true, value = "演示参数不为空且小于指定数字") @NotNull @LowerThan(20) Integer segmentNum) {
+    return ResultEntity.success(SystemCode.DO_OK).setData(segmentNum).build();
+}
+```
+- 返回数据
+```
+curl localhost:8080/example
+{"info":{"code":10902,"message":"segmentNum 为空"},"status":1}
+```
 
-|+common-boost:快速注册接口查询数据库包
-|+common-cache:缓存包
-|+common-distributed:分布式处理包
-|+common-context:上下文注册相关处理,代理类处理包
+```
+curl localhost:8080/example?segmentNum=21
+{"info":{"code":10913,"message":"segmentNum参数值不能大于20","systemCode":"PROMPT"},"status":1}
+```
+
+```
+curl localhost:8080/example?segmentNum=10
+{"data":10,"info":{"code":10906,"message":"执行成功","systemCode":"DO_OK"},"status":0}
+```
+
+
+待续
