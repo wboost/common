@@ -73,7 +73,7 @@ public class DefaultParameterConfigManager implements ParameterConfigManager, Ez
 
     @Override
     public void onWebApplicationEvent(ContextRefreshedEvent event) {
-        String[] checkers = event.getApplicationContext().getBeanNamesForType(ParameterConfigChecker.class);
+        String[] checkers = event.getApplicationContext().getBeanNamesForType(ParameterConfigChecker.class,true, false);
         for (int i = 0; i < checkers.length; i++) {
             String checkerBeanName = checkers[i];
             ParameterConfigChecker checker = event.getApplicationContext().getBean(checkerBeanName,
