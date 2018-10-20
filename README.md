@@ -1,6 +1,6 @@
 
-快速开发集成包
-=========================
+<img src="http://www.wboost.top/icon64.ico" width="28" hegiht="28" align=center />QUICK DEV SUPPORT
+================
 
 [Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs)
 ------
@@ -13,7 +13,7 @@
 - [统一参数验证机制，可复用，自由规则](#统一参数验证机制，可复用，自由规则)
 - 统一配置文件初始化机制
 - 自定义接收参数转换器
-- @AutoRootApplicationConfig,@AutoWebApplicationConfig > 扫描注解分离不同上下文(ROOT/WEB)且不与spring冲突
+- @AutoRootApplicationConfig,@AutoWebApplicationConfig > 扫描注解分离不同上下文
 - @AutoProxy > 代理类注册功能 
 - 统一返回值及异常处理，接口文档
 - es/kylin/sql等工具类
@@ -127,4 +127,4 @@ curl localhost:8080/example?segmentNum=10
 ```
 
 
-待续
+待续.
