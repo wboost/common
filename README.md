@@ -1,5 +1,4 @@
-
-<img src="http://www.wboost.top/icon64.ico" width="28" hegiht="28" align=center />QUICK DEV SUPPORT
+<img src="http://www.wboost.top/img/icon2.png" width="28" hegiht="28" align=center />QUICK DEV SUPPORT
 ================
 
 [Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs)
