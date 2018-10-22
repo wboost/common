@@ -29,8 +29,10 @@
 <tools-group-version>3.1.2.RELEASE</tools-group-version>
 </properties>
 ```
+
 ##### 根据项目类型引入
 - 传统web
+
 ```
 <dependency>
     <groupId>${tools-group-id}</groupId>
@@ -38,7 +40,9 @@
     <artifactId>common-boost</artifactId>
 </dependency>
 ```
+
 - springboot 
+
 ```
 <dependency>
     <groupId>${tools-group-id}</groupId>
@@ -46,12 +50,14 @@
     <artifactId>common-boot</artifactId>
 </dependency>
 ```
+
 boot项目自动扫描top.wboost.common,com.chinaoly及SpringApplication类下目录
 
 ------------
 #### 统一参数验证机制，可复用，自由规则
 默认提供@NotNull(不能为空)与@NotEmpty(不能为空且不能为空字符串)注解
 - 新建校验注解文件LowerThan,注解上增加@top.wboost.common.annotation.parameter.ParameterConfig
+
 ```
 // Integer、Long小于指定数据校验实例
 @Target({ ElementType.PARAMETER })
@@ -62,6 +68,7 @@ public @interface LowerThan {
     int value();
 }
 ```
+
 - 新建校验器LowerThanChecker类,并注入ioc（@AutoWebApplicationConfig）,且实现top.wboost.common.annotation.parameter.ParameterConfigChecker接口
 
 ```
@@ -100,7 +107,9 @@ public class LowerThanChecker implements ParameterConfigChecker {
 
 }
 ```
+
 - 使用
+
 ```
 @GetMapping("/example")
 @Explain(systemCode = SystemCode.DO_FAIL, value = "example")
@@ -109,7 +118,9 @@ public ResultEntity callTimeResult(
     return ResultEntity.success(SystemCode.DO_OK).setData(segmentNum).build();
 }
 ```
+
 - 返回数据
+
 ```
 curl localhost:8080/example
 {"info":{"code":10902,"message":"segmentNum 为空"},"status":1}
