@@ -1,13 +1,13 @@
 package top.wboost.common.listener;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 
 import top.wboost.common.base.annotation.AutoRootApplicationConfig;
 import top.wboost.common.utils.web.interfaces.context.EzApplicationListener;
+import top.wboost.common.utils.web.interfaces.context.EzWebApplicationListener;
 
 @AutoRootApplicationConfig
 public class EzApplicationListenerManagerImpl

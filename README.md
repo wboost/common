@@ -26,7 +26,7 @@
 ```
 <properties>
 <tools-group-id>top.wboost</tools-group-id>
-<tools-group-version>3.1.2.RELEASE</tools-group-version>
+<tools-group-version>3.1.3.RELEASE</tools-group-version>
 </properties>
 ```
 
