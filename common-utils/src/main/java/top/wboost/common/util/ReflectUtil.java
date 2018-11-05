@@ -34,7 +34,7 @@ public class ReflectUtil {
 
     /**
      * 获得泛型类型
-     * @param obj  存在泛型的类
+     * @param clazz  存在泛型的类
      * @param index 第几个泛型
      * @return 泛型类
      */

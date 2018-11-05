@@ -1,7 +1,7 @@
 package top.wboost.common.base.interfaces;
 
-public interface Warpper<T> {
+public interface Warpper<K,V> {
 
-    public T warp(Object val);
+    public V warp(K val);
 
 }

@@ -26,9 +26,9 @@ public class DefaultWildCardManager implements WildCardManager {
     private static final String SQL_WILDCARD = "\\$\\{-\\{(.*?)\\}-\\}";
     private static final String SQL_PARAM_WILDCARD = "\\{([^\\{]+?)\\}";
 
-    protected Warpper<String> warp;
+    protected Warpper<Object,String> warp;
 
-    public DefaultWildCardManager(Warpper<String> warp) {
+    public DefaultWildCardManager(Warpper<Object,String> warp) {
         super();
         this.warp = warp;
     }
@@ -74,7 +74,7 @@ public class DefaultWildCardManager implements WildCardManager {
         return text;
     }
 
-    public Warpper<String> getWarpper() {
+    public Warpper<Object,String > getWarpper() {
         return this.warp;
     }
 }

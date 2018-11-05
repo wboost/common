@@ -25,6 +25,7 @@ import top.wboost.common.utils.web.utils.PropertiesUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -134,6 +135,8 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         PropertySourcesPlaceholderConfigurer configurer = configPropertySourcesPlaceholderConfigurer(beanFactory);
+        String[] propertiesAwares = beanFactory.getBeanNamesForType(PropertiesAware.class);
+        Arrays.asList(propertiesAwares).forEach(propertiesAwareName -> beanFactory.getBean(propertiesAwareName,PropertiesAware.class).setProperties(localenv));
         mergeProperties(configurer);
     }
 

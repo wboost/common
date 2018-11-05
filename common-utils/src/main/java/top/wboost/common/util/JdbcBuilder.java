@@ -1,14 +1,13 @@
 package top.wboost.common.util;
 
 import lombok.Data;
+import org.apache.commons.io.IOUtils;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JdbcBuilder {
 
@@ -68,6 +67,16 @@ public class JdbcBuilder {
             return null;
         }
 
+        public void closeConnection(Connection connection) {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ioe) {
+                // ignore
+            }
+        }
+
         /**
          * 增加、删除、改
          *
@@ -78,10 +87,12 @@ public class JdbcBuilder {
         public boolean updateByPreparedStatement(String sql) throws SQLException {
             boolean flag = false;
             int result = -1;
-            Statement pstmt = getConnection().createStatement();
+            Connection connection = getConnection();
+            Statement pstmt = connection.createStatement();
             int index = 1;
             result = pstmt.executeUpdate(sql);
             flag = result > 0 ? true : false;
+            closeConnection(connection);
             return flag;
         }
 
@@ -95,7 +106,8 @@ public class JdbcBuilder {
         public Map<String, Object> findSimpleResult(String sql) throws SQLException {
             Map<String, Object> map = new HashMap<>();
             int index = 1;
-            Statement pstmt = getConnection().createStatement();
+            Connection connection = getConnection();
+            Statement pstmt = connection.createStatement();
             ResultSet resultSet = pstmt.executeQuery(sql);//返回查询结果
             ResultSetMetaData metaData = resultSet.getMetaData();
             int col_len = metaData.getColumnCount();
@@ -109,6 +121,7 @@ public class JdbcBuilder {
                     map.put(cols_name, cols_value);
                 }
             }
+            closeConnection(connection);
             return map;
         }
 
@@ -120,9 +133,12 @@ public class JdbcBuilder {
          * @throws SQLException
          */
         public List<Map<String, Object>> findModeResult(String sql) throws SQLException {
-            Statement pstmt = getConnection().createStatement();
+            Connection connection = getConnection();
+            Statement pstmt = connection.createStatement();
             ResultSet resultSet = pstmt.executeQuery(sql);
-            return resolveResultSet(resultSet);
+            List<Map<String, Object>> result = resolveResultSet(resultSet);
+            closeConnection(connection);
+            return result;
         }
 
         public List<Map<String, Object>> resolveResultSet(ResultSet resultSet) throws SQLException {
@@ -156,7 +172,8 @@ public class JdbcBuilder {
         public <T> T findSimpleRefResult(String sql, Class<T> cls) throws Exception {
             T resultObject = null;
             int index = 1;
-            Statement pstmt = getConnection().createStatement();
+            Connection connection = getConnection();
+            Statement pstmt = connection.createStatement();
             ResultSet resultSet = pstmt.executeQuery(sql);
             ResultSetMetaData metaData = resultSet.getMetaData();
             int cols_len = metaData.getColumnCount();
@@ -174,6 +191,7 @@ public class JdbcBuilder {
                     field.set(resultObject, cols_value);
                 }
             }
+            closeConnection(connection);
             return resultObject;
 
         }
@@ -189,7 +207,8 @@ public class JdbcBuilder {
         public <T> List<T> findMoreRefResult(String sql, Class<T> cls) throws Exception {
             List<T> list = new ArrayList<T>();
             int index = 1;
-            Statement pstmt = getConnection().createStatement();
+            Connection connection = getConnection();
+            Statement pstmt = connection.createStatement();
 
             ResultSet resultSet = pstmt.executeQuery(sql);
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -209,6 +228,7 @@ public class JdbcBuilder {
                 }
                 list.add(resultObject);
             }
+            closeConnection(connection);
             return list;
         }
     }
