@@ -25,6 +25,9 @@ public class Global {
     public final static boolean ISDEBUG = Boolean
             .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.IS_DEBUG));
 
+    public final static boolean SHOWSQL = Boolean
+            .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.SHOW_SQL));
+
     /**
      * JSON数据验证
      * @ClassName: HTMLVALIDATE
