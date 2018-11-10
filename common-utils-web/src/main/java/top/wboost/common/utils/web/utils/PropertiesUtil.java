@@ -1,8 +1,11 @@
 package top.wboost.common.utils.web.utils;
 
+import org.springframework.boot.env.PropertySourcesLoader;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -97,13 +100,7 @@ public class PropertiesUtil {
      * @param prefix 前缀
      */
     public static Map<String, Object> getPropertiesByPrefix(String prefix) {
-        Map<String, Object> retMap = new HashMap<>();
-        for (Entry<String, Object> entry : getAllProperties().entrySet()) {
-            if (entry.getKey().startsWith(prefix)) {
-                retMap.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return retMap;
+        return getPropertiesByPrefix(prefix, getAllProperties());
     }
 
     public static Map<String, Object> getAllProperties() {
@@ -112,17 +109,23 @@ public class PropertiesUtil {
                 .iterator();
         while (ite.hasNext()) {
             org.springframework.core.env.PropertySource<?> s = ite.next();
-            if (s.getSource() instanceof Map) {
-                retMap.putAll((Map<? extends String, ? extends String>) s.getSource());
-            } else if (s instanceof EnumerablePropertySource) {
-                EnumerablePropertySource<Collection<PropertySource<?>>> source = (EnumerablePropertySource<Collection<PropertySource<?>>>) s;
-                String[] nameArray = source.getPropertyNames();
-                Arrays.asList(nameArray).forEach(name -> {
-                    retMap.put(name, s.getProperty(name));
-                });
-            }
+            retMap.putAll(resolvePropertySource(s));
         }
         return retMap;
+    }
+
+    public static Map<String, Object> resolvePropertySource(org.springframework.core.env.PropertySource<?> propertySource) {
+        Map<String, Object> resolveMap = new HashMap<>();
+        if (propertySource.getSource() instanceof Map) {
+            resolveMap.putAll((Map<? extends String, ? extends String>) propertySource.getSource());
+        } else if (propertySource instanceof EnumerablePropertySource) {
+            EnumerablePropertySource<Collection<PropertySource<?>>> source = (EnumerablePropertySource<Collection<PropertySource<?>>>) propertySource;
+            String[] nameArray = source.getPropertyNames();
+            Arrays.asList(nameArray).forEach(name -> {
+                resolveMap.put(name, propertySource.getProperty(name));
+            });
+        }
+        return resolveMap;
     }
 
     private static EncodedResource[] loadResources(String location) {
@@ -138,6 +141,33 @@ public class PropertiesUtil {
             log.error("loadResource error", e);
             throw new BusinessException("loadResource error");
         }
+    }
+
+    private static PropertySourcesLoader propertySourcesLoader = new PropertySourcesLoader();
+    private static ResourceLoader resourceLoader = new DefaultResourceLoader();
+
+    public static PropertySource<?> loadPropertySource(String location) {
+        try {
+            Resource bootstrapResource = resourceLoader.getResource(location);
+            return propertySourcesLoader.load(bootstrapResource, "applicationConfig: [profile=]", "wboostConfigLoader: [" + location + "]", null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Map<String, Object> getPropertiesByPrefix(String prefix, PropertySource<?> propertySource) {
+        return getPropertiesByPrefix(prefix, resolvePropertySource(propertySource));
+    }
+
+    public static Map<String, Object> getPropertiesByPrefix(String prefix, Map<String, Object> propMap) {
+        Map<String, Object> retMap = new HashMap<>();
+        for (Entry<String, Object> entry : propMap.entrySet()) {
+            if (entry.getKey().startsWith(prefix)) {
+                retMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return retMap;
     }
 
     public static Object getPropertiesObject(String name) {
