@@ -1,13 +1,8 @@
 package top.wboost.common.boot.config;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,13 +11,19 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-
 import org.springframework.util.ClassUtils;
+import org.springframework.web.context.support.GenericWebApplicationContext;
 import top.wboost.common.base.ConfigForBase;
 import top.wboost.common.base.annotation.AutoConfig;
 import top.wboost.common.boot.util.SpringBootUtil;
 import top.wboost.common.util.StringUtil;
 import top.wboost.common.utils.web.utils.PropertiesUtil;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * 增加spring-boot初始化
@@ -45,16 +46,7 @@ public class ConfigForCommonBootApplicationContextInitializer
     public void initialize(ConfigurableApplicationContext context) {
         if (context instanceof AnnotationConfigEmbeddedWebApplicationContext) {
             AnnotationConfigEmbeddedWebApplicationContext webContext = (AnnotationConfigEmbeddedWebApplicationContext) context;
-            String[] initPackages = ConfigForBase.BasePackage.allPackages();
-            String appPackage = ClassUtils.getPackageName(SpringBootUtil.getLauncherClass().getName());
-            List<String> scanPackages = new ArrayList<>(Arrays.asList(initPackages));
-            scanPackages.add(appPackage);
-            String property = PropertiesUtil.getProperty("common.conf.add_scan_packages");
-            if (StringUtil.notEmpty(property)) {
-                JSONArray addPackages = JSONArray.parseArray(property);
-                scanPackages.addAll(Arrays.asList(addPackages.toArray(new String[]{})));
-            }
-            webContext.scan(new HashSet<>(scanPackages).toArray(new String[]{}));
+            webContext.scan(scanPackages());
             try {
                 Field field = webContext.getClass().getDeclaredField("scanner");
                 field.setAccessible(true);
@@ -69,7 +61,29 @@ public class ConfigForCommonBootApplicationContextInitializer
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        } else if (context instanceof GenericWebApplicationContext) {
+            try {
+                SpringBootUtil.getLauncherClass();
+                ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+                ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner((BeanDefinitionRegistry) beanFactory);
+                scanner.addIncludeFilter(new AnnotationTypeFilter(AutoConfig.class));
+                scanner.scan(scanPackages());
+            } catch (Exception e) {
+                //no boot application.ignore
+            }
         }
     }
 
+    private String[] scanPackages() {
+        String[] initPackages = ConfigForBase.BasePackage.allPackages();
+        String appPackage = ClassUtils.getPackageName(SpringBootUtil.getLauncherClass().getName());
+        List<String> scanPackages = new ArrayList<>(Arrays.asList(initPackages));
+        scanPackages.add(appPackage);
+        String property = PropertiesUtil.getProperty("common.conf.add_scan_packages");
+        if (StringUtil.notEmpty(property)) {
+            JSONArray addPackages = JSONArray.parseArray(property);
+            scanPackages.addAll(Arrays.asList(addPackages.toArray(new String[]{})));
+        }
+        return new HashSet<>(scanPackages).toArray(new String[]{});
+    }
 }
