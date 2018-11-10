@@ -4,8 +4,11 @@ public class ConfigForBase {
 
     public interface PropertiesConfig {
         // 是否开发者模式(部分common日志/返回数据包含)
-        public final String IS_DEBUG = "is.debug";
+        public final String IS_DEBUG = "common.dev.debug";
+        // 展示sql
+        public final String SHOW_SQL = "common.dev.show-sql";
     }
+
 
     public interface SCAN_CONFIG {
         public final String WEB = "#web";
@@ -36,3 +39,4 @@ public class ConfigForBase {
     public static final String BEAN_NAME_GENERATOR_CLASS = "top.wboost.common.context.generator.ConfigAnnotationBeanNameGenerator";
 
 }
+

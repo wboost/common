@@ -1,0 +1,23 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "top.wboost.common.base.PropertiesConfigShow",
+      "name": "common.dev",
+      "type": "top.wboost.common.base.PropertiesConfigShow"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "top.wboost.common.base.PropertiesConfigShow",
+      "name": "common.dev.debug",
+      "description": "开发者模式.",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "top.wboost.common.base.PropertiesConfigShow",
+      "name": "common.dev.show-sql",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}
