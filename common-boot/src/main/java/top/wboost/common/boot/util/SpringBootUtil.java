@@ -66,6 +66,7 @@ public class SpringBootUtil {
                     Class<?> clazz = Class.forName(stackClassName);
                     SpringBootApplication springBootApp = AnnotationUtils.getAnnotation(clazz, SpringBootApplication.class);
                     if (springBootApp != null) {
+                        runApp = clazz;
                         return clazz;
                     }
                 } catch (ClassNotFoundException e) {

@@ -44,6 +44,7 @@ public class ConfigForCommonBootApplicationContextInitializer
 
     @Override
     public void initialize(ConfigurableApplicationContext context) {
+        boolean isBoot = false;
         if (context instanceof AnnotationConfigEmbeddedWebApplicationContext) {
             AnnotationConfigEmbeddedWebApplicationContext webContext = (AnnotationConfigEmbeddedWebApplicationContext) context;
             webContext.scan(scanPackages());
@@ -61,6 +62,7 @@ public class ConfigForCommonBootApplicationContextInitializer
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+            isBoot = true;
         } else if (context instanceof GenericWebApplicationContext) {
             try {
                 SpringBootUtil.getLauncherClass();
@@ -68,9 +70,14 @@ public class ConfigForCommonBootApplicationContextInitializer
                 ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner((BeanDefinitionRegistry) beanFactory);
                 scanner.addIncludeFilter(new AnnotationTypeFilter(AutoConfig.class));
                 scanner.scan(scanPackages());
+                isBoot = true;
             } catch (Exception e) {
                 //no boot application.ignore
             }
+        }
+        if (isBoot) {
+            //初始化获得启动类
+            SpringBootUtil.getLauncherClass();
         }
     }
 
