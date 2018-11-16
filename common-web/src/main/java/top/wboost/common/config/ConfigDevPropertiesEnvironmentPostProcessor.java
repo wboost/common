@@ -7,15 +7,9 @@ import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.PropertySourcesLoader;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
-import top.wboost.common.base.ConfigForBase;
 import top.wboost.common.log.util.LoggerUtil;
-import top.wboost.common.util.QuickHashMap;
-
-import java.util.Map;
 
 public class ConfigDevPropertiesEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
@@ -29,11 +23,16 @@ public class ConfigDevPropertiesEnvironmentPostProcessor implements EnvironmentP
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         // 是否为开发者模式
-        String isDebug = environment.getProperty(ConfigForBase.PropertiesConfig.IS_DEBUG);
+//        String isDebug = environment.getProperty(ConfigForBase.PropertiesConfig.IS_DEBUG);
+//        if (StringUtil.notEmpty(showSql)) {
+//            Map<String,Object> devMap = new QuickHashMap<String,Object>().quickPut("spring.jpa.show-sql", showSql);
+//        }
         // 是否展示sql
-        String showSql = environment.getProperty(ConfigForBase.PropertiesConfig.SHOW_SQL);
-        Map<String,Object> devMap = new QuickHashMap<String,Object>().quickPut("spring.jpa.show-sql", showSql);
-        environment.getPropertySources().addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, new MapPropertySource("WBOOST_DEV_PROPERTIES", devMap));
+//        String showSql = environment.getProperty(ConfigForBase.PropertiesConfig.SHOW_SQL);
+//        if (StringUtil.notEmpty(showSql)) {
+//            Map<String, Object> devMap = new QuickHashMap<String, Object>().quickPut("spring.jpa.show-sql", showSql);
+//            environment.getPropertySources().addAfter(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, new MapPropertySource("WBOOST_DEV_PROPERTIES", devMap));
+//        }
     }
 
     @Override

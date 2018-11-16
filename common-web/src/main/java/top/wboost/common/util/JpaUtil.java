@@ -2,27 +2,18 @@ package top.wboost.common.util;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.orm.jpa.EntityManagerFactoryInfo;
 import top.wboost.common.annotation.QueryByBetween;
 import top.wboost.common.annotation.QueryByEquals;
 import top.wboost.common.annotation.QueryByLike;
 import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.util.LoggerUtil;
-import top.wboost.common.utils.web.utils.PropertiesUtil;
-import top.wboost.common.utils.web.utils.SpringBeanUtil;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.sql.DataSource;
 import java.lang.reflect.Field;
-import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 /**
  * spring data jpa工具类
@@ -34,133 +25,133 @@ import java.util.Date;
 @SuppressWarnings("deprecation")
 public class JpaUtil {
 
-    public static final String dataSource = PropertiesUtil.getProperty("import.jdbc.util") + "."
-            + PropertiesUtil.getProperty("import.dataSource");
-    public static EntityManagerFactory entityManagerFactory = null;
-    public static DataSource dataSourceImpl = null;
+    //    public static final String dataSource = PropertiesUtil.getProperty("import.jdbc.util") + "."
+//            + PropertiesUtil.getProperty("import.dataSource");
+//    public static EntityManagerFactory entityManagerFactory = null;
+//    public static DataSource dataSourceImpl = null;
     private static Logger log = LoggerUtil.getLogger(JpaUtil.class);
 
-    static {
-        org.springframework.orm.jpa.JpaTransactionManager JpaTransactionManager = (org.springframework.orm.jpa.JpaTransactionManager) SpringBeanUtil
-                .getBean("transactionManager");
-        entityManagerFactory = JpaTransactionManager.getEntityManagerFactory();
-        dataSourceImpl = ((EntityManagerFactoryInfo) SpringBeanUtil.getBean("entityManagerFactory")).getDataSource();
-    }
-
-    /**
-     * 原生sql查询(结果为jdbc的格式，没有key，尽量不用)
-     * @author jwSun
-     * @date 2017年4月6日 下午3:56:50
-     * @param sql 执行sql
-     * @return
-     */
-    public static List<?> execute(String sql) {
-        return execute(sql, entityManagerFactory);
-    }
-
-    public static List<?> execute(String sql, EntityManagerFactory entityManagerFactory) {
-        List<?> objecArraytList = null;
-        objecArraytList = executeByJdbc(sql);
-        if (objecArraytList == null) {
-            objecArraytList = executeByHibernate(sql, entityManagerFactory);
-        }
-        return objecArraytList;
-    }
-
-    /**
-     * 使用hibernate entityManagerFactory获取数据
-     * @param sql
-     * @param entityManagerFactory
-     * @return
-     */
-    public static List<?> executeByHibernate(String sql, EntityManagerFactory entityManagerFactory) {
-        List<?> objecArraytList = null;
-        try {
-            EntityManager em = entityManagerFactory.createEntityManager();
-            Query query = em.createNativeQuery(sql);
-            objecArraytList = query.getResultList();
-            em.close();
-        } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
-        }
-        return objecArraytList;
-    }
-
-    /**
-     * 使用原生jdbc+连接池获取数据
-     * @param sql
-     * @return
-     */
-    public static List<?> executeByJdbc(String sql) {
-        List<?> objecArraytList = null;
-        Connection connection = null;
-        try {
-            connection = dataSourceImpl.getConnection();
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            objecArraytList = new ArrayList<>();
-            @SuppressWarnings("unchecked")
-            List<Object> list = (List<Object>) objecArraytList;
-            int columnCount = rs.getMetaData().getColumnCount();
-            while (rs.next()) {
-                Object[] obj = new Object[columnCount];
-                for (int i = 1; i <= columnCount; i++) {
-                    obj[i - 1] = rs.getObject(i);
-                }
-                list.add(obj);
-            }
-            rs.close();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return objecArraytList;
-    }
-
-    public static List<Map<String, Object>> executeByJdbcModel(String sql) {
-        List<Map<String, Object>> objecArraytList = null;
-        Connection connection = null;
-        try {
-            connection = dataSourceImpl.getConnection();
-            Statement stmt = connection.createStatement();
-            ResultSet resultSet = stmt.executeQuery(sql);
-            objecArraytList = new ArrayList<>();
-            @SuppressWarnings("unchecked")
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int cols_len = metaData.getColumnCount();
-            while (resultSet.next()) {
-                Map<String, Object> map = new HashMap<String, Object>();
-                for (int i = 0; i < cols_len; i++) {
-                    String cols_name = metaData.getColumnName(i + 1);
-                    Object cols_value = resultSet.getObject(cols_name);
-                    if (cols_value == null) {
-                        cols_value = "";
-                    }
-                    map.put(cols_name, cols_value);
-                }
-                objecArraytList.add(map);
-            }
-            resultSet.close();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return objecArraytList;
-    }
+//    static {
+//        org.springframework.orm.jpa.JpaTransactionManager JpaTransactionManager = (org.springframework.orm.jpa.JpaTransactionManager) SpringBeanUtil
+//                .getBean("transactionManager");
+//        entityManagerFactory = JpaTransactionManager.getEntityManagerFactory();
+//        dataSourceImpl = ((EntityManagerFactoryInfo) SpringBeanUtil.getBean("entityManagerFactory")).getDataSource();
+//    }
+//
+//    /**
+//     * 原生sql查询(结果为jdbc的格式，没有key，尽量不用)
+//     * @author jwSun
+//     * @date 2017年4月6日 下午3:56:50
+//     * @param sql 执行sql
+//     * @return
+//     */
+//    public static List<?> execute(String sql) {
+//        return execute(sql, entityManagerFactory);
+//    }
+//
+//    public static List<?> execute(String sql, EntityManagerFactory entityManagerFactory) {
+//        List<?> objecArraytList = null;
+//        objecArraytList = executeByJdbc(sql);
+//        if (objecArraytList == null) {
+//            objecArraytList = executeByHibernate(sql, entityManagerFactory);
+//        }
+//        return objecArraytList;
+//    }
+//
+//    /**
+//     * 使用hibernate entityManagerFactory获取数据
+//     * @param sql
+//     * @param entityManagerFactory
+//     * @return
+//     */
+//    public static List<?> executeByHibernate(String sql, EntityManagerFactory entityManagerFactory) {
+//        List<?> objecArraytList = null;
+//        try {
+//            EntityManager em = entityManagerFactory.createEntityManager();
+//            Query query = em.createNativeQuery(sql);
+//            objecArraytList = query.getResultList();
+//            em.close();
+//        } catch (Exception e) {
+//            log.error(e.getLocalizedMessage());
+//        }
+//        return objecArraytList;
+//    }
+//
+//    /**
+//     * 使用原生jdbc+连接池获取数据
+//     * @param sql
+//     * @return
+//     */
+//    public static List<?> executeByJdbc(String sql) {
+//        List<?> objecArraytList = null;
+//        Connection connection = null;
+//        try {
+//            connection = dataSourceImpl.getConnection();
+//            Statement stmt = connection.createStatement();
+//            ResultSet rs = stmt.executeQuery(sql);
+//            objecArraytList = new ArrayList<>();
+//            @SuppressWarnings("unchecked")
+//            List<Object> list = (List<Object>) objecArraytList;
+//            int columnCount = rs.getMetaData().getColumnCount();
+//            while (rs.next()) {
+//                Object[] obj = new Object[columnCount];
+//                for (int i = 1; i <= columnCount; i++) {
+//                    obj[i - 1] = rs.getObject(i);
+//                }
+//                list.add(obj);
+//            }
+//            rs.close();
+//        } catch (SQLException e1) {
+//            e1.printStackTrace();
+//        } finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                } catch (SQLException e1) {
+//                    e1.printStackTrace();
+//                }
+//            }
+//        }
+//        return objecArraytList;
+//    }
+//
+//    public static List<Map<String, Object>> executeByJdbcModel(String sql) {
+//        List<Map<String, Object>> objecArraytList = null;
+//        Connection connection = null;
+//        try {
+//            connection = dataSourceImpl.getConnection();
+//            Statement stmt = connection.createStatement();
+//            ResultSet resultSet = stmt.executeQuery(sql);
+//            objecArraytList = new ArrayList<>();
+//            @SuppressWarnings("unchecked")
+//            ResultSetMetaData metaData = resultSet.getMetaData();
+//            int cols_len = metaData.getColumnCount();
+//            while (resultSet.next()) {
+//                Map<String, Object> map = new HashMap<String, Object>();
+//                for (int i = 0; i < cols_len; i++) {
+//                    String cols_name = metaData.getColumnName(i + 1);
+//                    Object cols_value = resultSet.getObject(cols_name);
+//                    if (cols_value == null) {
+//                        cols_value = "";
+//                    }
+//                    map.put(cols_name, cols_value);
+//                }
+//                objecArraytList.add(map);
+//            }
+//            resultSet.close();
+//        } catch (SQLException e1) {
+//            e1.printStackTrace();
+//        } finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                } catch (SQLException e1) {
+//                    e1.printStackTrace();
+//                }
+//            }
+//        }
+//        return objecArraytList;
+//    }
 
     /**
      * 获得Specification条件查询
