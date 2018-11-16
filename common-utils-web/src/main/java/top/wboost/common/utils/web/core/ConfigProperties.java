@@ -8,6 +8,7 @@ import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySources;
 import org.springframework.core.io.Resource;
@@ -144,8 +145,8 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         PropertySources sources = configurer.getAppliedPropertySources();
         sources.forEach(source -> {
             Object env = source.getSource();
-            if (env instanceof StandardServletEnvironment) {
-                StandardServletEnvironment ssenv = (StandardServletEnvironment) env;
+            if (env instanceof ConfigurableEnvironment) {
+                ConfigurableEnvironment ssenv = (ConfigurableEnvironment) env;
                 ssenv.merge(localenv);
                 localenv.merge(ssenv);
             }
