@@ -1,13 +1,14 @@
 package top.wboost.common.util;
 
 import lombok.Data;
-import org.apache.commons.io.IOUtils;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JdbcBuilder {
 
@@ -104,7 +105,7 @@ public class JdbcBuilder {
          * @throws SQLException
          */
         public Map<String, Object> findSimpleResult(String sql) throws SQLException {
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             int index = 1;
             Connection connection = getConnection();
             Statement pstmt = connection.createStatement();
@@ -146,7 +147,7 @@ public class JdbcBuilder {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int cols_len = metaData.getColumnCount();
             while (resultSet.next()) {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new LinkedHashMap<>();
                 for (int i = 0; i < cols_len; i++) {
                     String cols_name = metaData.getColumnName(i + 1);
                     Object cols_value = resultSet.getObject(cols_name);
