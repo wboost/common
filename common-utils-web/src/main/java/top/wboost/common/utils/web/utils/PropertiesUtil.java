@@ -9,6 +9,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.util.AntPathMatcher;
 import top.wboost.common.base.enums.CharsetEnum;
 import top.wboost.common.exception.BusinessException;
 import top.wboost.common.log.entity.Logger;
@@ -19,12 +20,15 @@ import top.wboost.common.utils.web.core.ConfigProperties;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 public class PropertiesUtil {
 
     private static Logger log = LoggerUtil.getLogger(PropertiesUtil.class);
 
     private static PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+
+    private static AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     /**
      * 获得配置文件参数
@@ -79,6 +83,23 @@ public class PropertiesUtil {
             // ignore
         }
         return val == null ? defaultVal : val;
+    }
+
+    /**
+     * 匹配通配符配置
+     *
+     * @param pattern 通配符*
+     * @return
+     */
+    public static Map<String, Object> getPropertiesByPattern(String pattern) {
+        Pattern patternDo = Pattern.compile(pattern);
+        Map<String, Object> filterMap = new LinkedHashMap<>();
+        PropertiesUtil.getAllProperties().forEach((key, val) -> {
+            if (patternDo.matcher(key).find()) {
+                filterMap.put(key, val);
+            }
+        });
+        return filterMap;
     }
 
     public static Properties loadProperties(String location) {
