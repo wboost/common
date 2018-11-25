@@ -159,7 +159,8 @@
 		
 	</dependencyManagement>
 
-	<!-- profiles不会共享给子项目,但会给子项目此profiles的默认值 -->
+
+    <!-- profiles不会共享给子项目,但会给子项目此profiles的默认值 -->
 	<profiles>
 		<profile>
             <id>release</id>
@@ -223,23 +224,25 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
-        	<id>chinaoly</id>
-        	<distributionManagement>
-				<snapshotRepository>
-					<id>nexus2</id>
-					<name>common-manager</name>
-					<url>http://freeboy.iok.la:8081/repository/chinaoly/</url>
-					<uniqueVersion>true</uniqueVersion>
-				</snapshotRepository>
-		
-				<repository>
-					<id>nexus2</id>
-					<name>User Porject Release</name>
-					<url>http://freeboy.iok.la:8081/repository/chinaoly/</url>
-				</repository>
-			</distributionManagement>
+            <id>chinaoly</id>
+            <distributionManagement>
+                <repository>
+                    <id>releases</id>
+                    <name>ChinaolyReleases</name>
+                    <url>
+                        http://192.168.3.189/nexus/content/repositories/releases/
+                    </url>
+                </repository>
+                <snapshotRepository>
+                    <id>snapshots</id>
+                    <name>ChinaolySnapshots</name>
+                    <url>
+                        http://192.168.3.189/nexus/content/repositories/snapshots/
+                    </url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
 	</profiles>
 	
