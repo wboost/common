@@ -10,6 +10,7 @@ import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.util.LoggerUtil;
 import top.wboost.common.system.exception.BeanNotFindException;
 import top.wboost.common.system.exception.SystemException;
+import top.wboost.common.util.ReflectUtil;
 import top.wboost.common.utils.web.interfaces.context.EzApplicationListener;
 import top.wboost.common.utils.web.utils.AopUtils;
 import top.wboost.common.utils.web.utils.SpringBeanUtil;
@@ -41,18 +42,26 @@ public class ConfigForAutowiredService implements EzApplicationListener {
 
     protected void autowired(BaseJpaServiceImpl service) {
         Class<?> clazz = ClassUtils.getUserClass(service);
-        if (clazz.getSimpleName().indexOf("ServiceImpl") == -1) {
-            throw new SystemException("服务层类名必须以ServiceImpl结尾");
-        }
-        String className = clazz.getSimpleName().substring(0, clazz.getSimpleName().indexOf("ServiceImpl"));
-        className = Character.toLowerCase(className.charAt(0)) + className.substring(1, className.length());
-        String defaultBeanName = className + "Repository";
-        Object repository = SpringBeanUtil.getBean(defaultBeanName);
+        Object repository = null;
+        Class<?> genericInterfaces = ReflectUtil.getGenericInterfaces(clazz, 1);
+        repository = SpringBeanUtil.getBean(genericInterfaces);
+        String defaultBeanName = null;
         if (repository == null) {
-            log.warn("cant find bean:" + defaultBeanName + ",please check");
-            return;
+            if (clazz.getSimpleName().indexOf("ServiceImpl") == -1) {
+                throw new SystemException("服务层类名必须以ServiceImpl结尾");
+            }
+            String className = clazz.getSimpleName().substring(0, clazz.getSimpleName().indexOf("ServiceImpl"));
+            className = Character.toLowerCase(className.charAt(0)) + className.substring(1, className.length());
+            defaultBeanName = className + "Repository";
+            repository = SpringBeanUtil.getBean(defaultBeanName);
+            if (repository == null) {
+                log.warn("cant find bean:" + defaultBeanName + ",please check");
+                return;
+            }
+        } else {
+            defaultBeanName = genericInterfaces.getName();
         }
-        if (repository instanceof BaseRepository) {
+        if (repository != null && repository instanceof BaseRepository) {
             BaseRepository<?, ?> findRepository = (BaseRepository<?, ?>) repository;
             log.info("auto config bean: " + defaultBeanName + " to service:" + clazz.getName());
             service.setRepository(findRepository);
