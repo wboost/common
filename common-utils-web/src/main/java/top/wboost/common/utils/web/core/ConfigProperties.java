@@ -8,6 +8,8 @@ import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySources;
@@ -48,7 +50,7 @@ import java.util.Set;
  * @date 2017年3月4日 上午10:02:27
  */
 public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor */BeanDefinitionRegistryPostProcessor,
-        EzRootApplicationListener, EnvironmentAware, EmbeddedValueResolverAware {
+        EzRootApplicationListener, EnvironmentAware, EmbeddedValueResolverAware, PriorityOrdered {
 
     public static final String DEFAULT_PROPERTIES = "classpath*:properties/common-default.properties";
     public static final String SYS_PROPERTIES_SCAN = "classpath*:sys/properties/*.properties";
@@ -135,10 +137,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        PropertySourcesPlaceholderConfigurer configurer = configPropertySourcesPlaceholderConfigurer(beanFactory);
-        String[] propertiesAwares = beanFactory.getBeanNamesForType(PropertiesAware.class);
-        Arrays.asList(propertiesAwares).forEach(propertiesAwareName -> beanFactory.getBean(propertiesAwareName,PropertiesAware.class).setProperties(localenv));
-        mergeProperties(configurer);
+
     }
 
     private void mergeProperties(PropertySourcesPlaceholderConfigurer configurer) {
@@ -164,7 +163,11 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-
+        ConfigurableListableBeanFactory beanFactory = (ConfigurableListableBeanFactory) registry;
+        PropertySourcesPlaceholderConfigurer configurer = configPropertySourcesPlaceholderConfigurer(beanFactory);
+        String[] propertiesAwares = beanFactory.getBeanNamesForType(PropertiesAware.class);
+        Arrays.asList(propertiesAwares).forEach(propertiesAwareName -> beanFactory.getBean(propertiesAwareName, PropertiesAware.class).setProperties(localenv));
+        mergeProperties(configurer);
     }
 
     @Override
@@ -177,4 +180,8 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         ConfigProperties.resolver = resolver;
     }
 
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE + 1;
+    }
 }
