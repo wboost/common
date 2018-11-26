@@ -6,7 +6,7 @@
   <parent>
     <groupId>top.wboost</groupId>
     <artifactId>common-message-queue</artifactId>
-      <version>3.1.4-SNAPSHOT</version>
+      <version>3.1.4.RELEASE</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>common-message-queue-base</artifactId>
