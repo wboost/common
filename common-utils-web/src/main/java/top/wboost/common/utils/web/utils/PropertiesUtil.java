@@ -60,7 +60,10 @@ public class PropertiesUtil {
                     val = ConfigProperties.localenv.getProperty(name, defaultVal);
                 }
                 if (("${" + name + "}").equals(val)) {
-                    val = null;
+                    val = ConfigProperties.localenv.getProperty(name, defaultVal);
+                    if (("${" + name + "}").equals(val)) {
+                        val = null;
+                    }
                 }
             } else {
                 try {
@@ -193,6 +196,23 @@ public class PropertiesUtil {
 
     public static Object getPropertiesObject(String name) {
         return getAllProperties().get(name);
+    }
+
+    /**
+     * 解析值中${} 为正确数据
+     *
+     * @param props
+     * @return
+     */
+    public Map<String, Object> resolveProperties(Map<String, Object> props) {
+        Map<String, Object> retMap = new HashMap<>();
+        props.forEach((key, val) -> {
+            if (val instanceof String)
+                retMap.put(key, getProperty(key));
+            else
+                retMap.put(key, val);
+        });
+        return retMap;
     }
 
 }

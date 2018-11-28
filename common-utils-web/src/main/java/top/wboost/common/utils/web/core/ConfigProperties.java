@@ -13,6 +13,7 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySources;
+import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -168,6 +169,18 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         String[] propertiesAwares = beanFactory.getBeanNamesForType(PropertiesAware.class);
         Arrays.asList(propertiesAwares).forEach(propertiesAwareName -> beanFactory.getBean(propertiesAwareName, PropertiesAware.class).setProperties(localenv));
         mergeProperties(configurer);
+        PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(localenv.getPropertySources());
+        boolean trimValues = false;
+        boolean ignoreUnresolvablePlaceholders = false;
+        beanFactory.addEmbeddedValueResolver((strVal -> {
+            String resolved = (ignoreUnresolvablePlaceholders ?
+                    propertyResolver.resolvePlaceholders(strVal) :
+                    propertyResolver.resolveRequiredPlaceholders(strVal));
+            if (trimValues) {
+                resolved = resolved.trim();
+            }
+            return (resolved.equals(null) ? null : resolved);
+        }));
     }
 
     @Override
