@@ -128,18 +128,40 @@ public class PropertiesUtil {
     }
 
     public static Map<String, Object> getAllProperties() {
-        Map<String, Object> retMap = new HashMap<>();
-        Iterator<org.springframework.core.env.PropertySource<?>> ite = ConfigProperties.localenv.getPropertySources()
+        Map<String, Object> retMap = new NoConverterMap<>();
+        Iterator<PropertySource<?>> ite = ConfigProperties.localenv.getPropertySources()
                 .iterator();
         while (ite.hasNext()) {
-            org.springframework.core.env.PropertySource<?> s = ite.next();
+            PropertySource<?> s = ite.next();
             retMap.putAll(resolvePropertySource(s));
         }
         return retMap;
     }
 
+    /**
+     * 不可改值Map 当有一个key时，后续存入key不会覆盖之前的值
+     *
+     * @param <K>
+     * @param <V>
+     */
+    public static class NoConverterMap<K, V> extends HashMap<K, V> {
+        @Override
+        public V put(K key, V value) {
+            if (!this.containsKey(key)) {
+                return super.put(key, value);
+            }
+            return null;
+        }
+
+        public void putAll(Map<? extends K, ? extends V> m) {
+            m.entrySet().forEach(entry -> {
+                put(entry.getKey(), entry.getValue());
+            });
+        }
+    }
+
     public static Map<String, Object> resolvePropertySource(org.springframework.core.env.PropertySource<?> propertySource) {
-        Map<String, Object> resolveMap = new HashMap<>();
+        Map<String, Object> resolveMap = new NoConverterMap<>();
         if (propertySource.getSource() instanceof Map) {
             resolveMap.putAll((Map<? extends String, ? extends String>) propertySource.getSource());
         } else if (propertySource instanceof EnumerablePropertySource) {
@@ -204,7 +226,7 @@ public class PropertiesUtil {
      * @param props
      * @return
      */
-    public Map<String, Object> resolveProperties(Map<String, Object> props) {
+    public static Map<String, Object> resolveProperties(Map<String, Object> props) {
         Map<String, Object> retMap = new HashMap<>();
         props.forEach((key, val) -> {
             if (val instanceof String)

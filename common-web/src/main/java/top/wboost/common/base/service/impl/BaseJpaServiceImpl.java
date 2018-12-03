@@ -1,15 +1,8 @@
 package top.wboost.common.base.service.impl;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
-
 import top.wboost.common.base.enums.QueryType;
 import top.wboost.common.base.page.BasePage;
 import top.wboost.common.base.page.QueryPage;
@@ -20,14 +13,21 @@ import top.wboost.common.util.JpaUtil;
 import top.wboost.common.util.ReflectUtil;
 import top.wboost.common.utils.web.utils.ConvertUtil;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 使用JPA Service公共基础类
  * @className BaseJpaService
  * @author jwSun
  * @date 2017年6月28日 下午8:10:54   
  * @version 1.0.0
- * @param <V>
- * @param <V>
+ * @param <T>
+ * @param <K>
+ * @param <ID>
  */
 public class BaseJpaServiceImpl<T, K extends BaseJpaRepository<T, ID>, ID extends java.io.Serializable>
         extends BaseServiceImpl<T, ID> implements BaseJpaService<T, ID> {
@@ -60,7 +60,7 @@ public class BaseJpaServiceImpl<T, K extends BaseJpaRepository<T, ID>, ID extend
 
     /**
      * 根据调传入条件查询List
-     * @param Specification specification
+     * @param spec specification
      */
     public Page<T> findList(Specification<T> spec) {
         return findList(spec, null);

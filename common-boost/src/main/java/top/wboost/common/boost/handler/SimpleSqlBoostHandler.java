@@ -1,17 +1,14 @@
 package top.wboost.common.boost.handler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.ModelAndView;
-
 import com.alibaba.fastjson.JSONObject;
-
-import top.wboost.common.base.annotation.AutoWebApplicationConfig;
+import org.springframework.web.servlet.ModelAndView;
 import top.wboost.common.util.StringUtil;
 import top.wboost.common.utils.web.utils.HtmlUtil;
 
-@AutoWebApplicationConfig("simpleSqlBoostHandler")
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+// @AutoWebApplicationConfig("simpleSqlBoostHandler")
 public class SimpleSqlBoostHandler extends AbstractSqlBoostHandler {
 
     @Override

@@ -1,11 +1,5 @@
 package top.wboost.common.utils.web.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
@@ -14,6 +8,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.util.LoggerUtil;
+
+import java.util.*;
 
 /**
  * JSONObject扩展工具类
@@ -27,11 +23,18 @@ public class JSONObjectUtil {
     public static SerializeConfig serializeConfig = new SerializeConfig();
 
     private static Logger log = LoggerUtil.getLogger(JSONObjectUtil.class);
-
+    private static boolean hasHibernate = false;
     static {
         SimpleDateFormatSerializer dateFormat = new SimpleDateFormatSerializer(DateUtil.DATE.YYYY_MM_DD_HH_MM_SS);
         serializeConfig.put(java.util.Date.class, dateFormat);
         serializeConfig.put(java.sql.Timestamp.class, dateFormat);
+        try {
+            Class.forName("org.hibernate.collection.internal.PersistentSet");
+            Class.forName("org.hibernate.proxy.HibernateProxy");
+            hasHibernate = true;
+        } catch (ClassNotFoundException e) {
+            // ignore
+        }
     };
 
     /**
@@ -43,7 +46,7 @@ public class JSONObjectUtil {
         if (value == null) {
             return false;
         }
-        return HibernateUtil.wasInitialized(value);
+        return hasHibernate ? HibernateUtil.wasInitialized(value) : true;
     };
 
     public static PropertyFilter buildPropertyFilter(String... fieldNames) {
@@ -57,7 +60,7 @@ public class JSONObjectUtil {
             if (fieldNameList.contains(name) || value == null) {
                 return false;
             }
-            return HibernateUtil.wasInitialized(value);
+            return hasHibernate ? HibernateUtil.wasInitialized(value) : true;
         };
     }
 
