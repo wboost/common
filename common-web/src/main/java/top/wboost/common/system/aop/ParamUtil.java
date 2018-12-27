@@ -1,17 +1,23 @@
 package top.wboost.common.system.aop;
 
+import com.alibaba.fastjson.JSONObject;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
-import org.aspectj.lang.JoinPoint;
-
-import com.alibaba.fastjson.JSONObject;
-
 public class ParamUtil {
+
+    private static ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
     /**
      * 获得日志数据json
@@ -22,17 +28,25 @@ public class ParamUtil {
      * @date 2016年7月20日下午9:43:41
      */
     public static String getParamJson(JoinPoint joinPoint) {
-        Object[] objects = joinPoint.getArgs();
-        StringBuffer sb = new StringBuffer();
-        for (Object obj : objects) {
-            if (!(obj == null || obj instanceof HttpSession
-                    || obj instanceof org.springframework.web.multipart.commons.CommonsMultipartFile
-                    || obj.getClass().getName()
-                            .indexOf("org.springframework.web.multipart.commons.CommonsMultipartFile") == -1)) {
-                sb.append(JSONObject.toJSONString(obj));
+        Map<String, Object> paramMap = new LinkedHashMap<>();
+        try {
+            MethodSignature methodSignature = ((MethodSignature) joinPoint.getSignature());
+            Method domethod = methodSignature.getMethod();
+            String[] parameterNames = parameterNameDiscoverer.getParameterNames(domethod);
+            Object[] objects = joinPoint.getArgs();
+            for (int i = 0; i < objects.length; i++) {
+                Object obj = objects[i];
+                if (!(obj == null || obj instanceof HttpSession || obj instanceof ServletRequest || obj instanceof ServletResponse
+                        || obj instanceof org.springframework.web.multipart.commons.CommonsMultipartFile
+                        || obj.getClass().getName()
+                        .indexOf("org.springframework.web.multipart.commons.CommonsMultipartFile") != -1)) {
+                    paramMap.put(parameterNames[i], obj);
+                }
             }
+            return JSONObject.toJSONString(paramMap);
+        } catch (Exception e) {
+            return "{}";
         }
-        return sb.toString();
     }
 
     /**
