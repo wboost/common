@@ -1,18 +1,17 @@
 package top.wboost.common.base.entity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.data.domain.Page;
-
 import top.wboost.common.base.enums.ResultStatus;
 import top.wboost.common.constant.Global;
 import top.wboost.common.system.code.SystemCode;
 import top.wboost.common.util.QuickHashMap;
 import top.wboost.common.utils.web.utils.JSONConfig;
 import top.wboost.common.utils.web.utils.JSONObjectUtil;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 最终返回解析类
@@ -147,7 +146,7 @@ public class ResultEntity implements Serializable {
 
         /**
          * 执行结果状态
-         * @param ResultStatus {@link top.wboost.common.base.enums.ResultStatus}
+         * @param resultStatus {@link top.wboost.common.base.enums.ResultStatus}
          * @return
          */
         B setStatus(ResultStatus resultStatus);
@@ -189,7 +188,7 @@ public class ResultEntity implements Serializable {
 
         /**
          * 生成返回实体类
-         * @return {@link top.wboost.common.entity.ResultEntity}
+         * @return top.wboost.common.entity.ResultEntity
          */
         ResultEntity build();
     }
@@ -256,7 +255,7 @@ public class ResultEntity implements Serializable {
 
         /**
          * 存入执行参数
-         * @param params
+         * @param functionParams
          * @return FunctionBuilder
          */
         FunctionBuilder setFunctionParams(String functionParams);

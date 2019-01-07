@@ -1,17 +1,16 @@
 package top.wboost.common.log.core;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
-
 import top.wboost.common.base.annotation.AutoRootApplicationConfig;
 import top.wboost.common.base.core.ExecutorsDaemon;
 import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.entity.MethodLog;
 import top.wboost.common.log.interfaces.LogManager;
 import top.wboost.common.log.util.LoggerUtil;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 方法日志管理器

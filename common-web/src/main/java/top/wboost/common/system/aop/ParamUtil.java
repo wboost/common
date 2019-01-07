@@ -37,9 +37,7 @@ public class ParamUtil {
             for (int i = 0; i < objects.length; i++) {
                 Object obj = objects[i];
                 if (!(obj == null || obj instanceof HttpSession || obj instanceof ServletRequest || obj instanceof ServletResponse
-                        || obj instanceof org.springframework.web.multipart.commons.CommonsMultipartFile
-                        || obj.getClass().getName()
-                        .indexOf("org.springframework.web.multipart.commons.CommonsMultipartFile") != -1)) {
+                        || obj instanceof org.springframework.web.multipart.MultipartFile)) {
                     paramMap.put(parameterNames[i], obj);
                 }
             }

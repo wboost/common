@@ -11,6 +11,6 @@ import top.wboost.common.log.entity.BaseLog;
  */
 public interface LogManager<T extends BaseLog> {
 
-    public boolean sendLog(T log);
+    boolean sendLog(T log);
 
 }
