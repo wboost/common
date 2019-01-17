@@ -37,6 +37,7 @@ public class MethodLogManager implements LogManager<MethodLog>, ApplicationListe
 
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
+        log.info("close sendLogService");
         if (!sendLogService.isShutdown()) {
             sendLogService.shutdown();
         }
