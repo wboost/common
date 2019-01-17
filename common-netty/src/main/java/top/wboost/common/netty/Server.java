@@ -10,6 +10,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import top.wboost.common.netty.protocol.NettyDecoder;
+import top.wboost.common.netty.protocol.NettyEncoder;
 
 public class Server {
 
@@ -22,8 +24,8 @@ public class Server {
                     .handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            // socketChannel.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
-                            // socketChannel.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
+                            socketChannel.pipeline().addLast(new NettyEncoder());
+                            socketChannel.pipeline().addLast(new NettyDecoder());
                             socketChannel.pipeline().addLast(new ServerHandler());
                         }
                     })

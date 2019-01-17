@@ -11,16 +11,10 @@
 	</parent>
 	<artifactId>common-netty</artifactId>
 	<name>common-netty</name>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<netty.version>4.1.19.Final</netty.version>
-		<jboss-marshalling.version>2.0.2.Final</jboss-marshalling.version>
-	</properties>
 	<dependencies>
 
 		<dependency>
 			<groupId>${project-group-id}</groupId>
-			<version>${project-group-version}</version>
 			<artifactId>common-web</artifactId>
 			<scope>compile</scope>
 		</dependency>
@@ -28,19 +22,6 @@
 		<dependency>
 		    <groupId>io.netty</groupId>
 		    <artifactId>netty-all</artifactId>
-		    <version>${netty.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.marshalling</groupId>
-		    <artifactId>jboss-marshalling-river</artifactId>
-		    <version>${jboss-marshalling.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.marshalling</groupId>
-		    <artifactId>jboss-marshalling</artifactId>
-		    <version>${jboss-marshalling.version}</version>
 		</dependency>
 
 	</dependencies>
