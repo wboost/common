@@ -72,7 +72,8 @@
 		<!-- frame -->
 		<spring-boot.version>1.5.9.RELEASE</spring-boot.version>
 		<spring.version>4.3.6.RELEASE</spring.version>
-		<!-- /frame -->
+        <netty.version>4.1.19.Final</netty.version>
+        <!-- /frame -->
 
 		<!-- tools -->
 		<httpclient.version>4.5.2</httpclient.version>
@@ -252,6 +253,12 @@
 	            <type>pom</type>
 	            <scope>import</scope>
 	        </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
 
 			<!-- <dependency>
 				<groupId>org.apache.httpcomponents</groupId>
