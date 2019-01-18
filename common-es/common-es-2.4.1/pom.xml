@@ -1,31 +1,24 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.wboost</groupId>
-    <artifactId>common-es</artifactId>
-      <version>3.1.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>common-es-2.4.1</artifactId>
-  <build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-			</plugin>
-			<plugin>
-		          <artifactId>maven-source-plugin</artifactId>
-		    </plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-		    <groupId>org.elasticsearch</groupId>
-		    <artifactId>elasticsearch</artifactId>
-		    <version>2.4.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>top.wboost</groupId>
-		    <artifactId>common-sql</artifactId>
-		</dependency>
-	</dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.wboost</groupId>
+        <artifactId>common-es</artifactId>
+        <version>3.1.7-SNAPSHOT</version>
+    </parent>
+    <properties>
+        <main.basedir>${basedir}/../</main.basedir>
+    </properties>
+    <artifactId>common-es-2.4.1</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>top.wboost</groupId>
+            <artifactId>common-sql</artifactId>
+        </dependency>
+    </dependencies>
 </project>

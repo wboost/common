@@ -1,44 +1,30 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.wboost</groupId>
-    <artifactId>common</artifactId>
-      <version>3.1.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>common-log</artifactId>
-  <dependencies>
-  		
-  		<dependency>
-			<groupId>${project-group-id}</groupId>
-			<version>${project-group-version}</version>
-			<artifactId>common-base</artifactId>
-			<scope>compile</scope>
-		</dependency>
-  		
-		<!-- json -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-		</dependency>
-		<!-- /json -->
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.wboost</groupId>
+        <artifactId>common</artifactId>
+        <version>3.1.7-SNAPSHOT</version>
+    </parent>
+    <artifactId>common-log</artifactId>
+    <properties>
+        <main.basedir>${basedir}/../</main.basedir>
+    </properties>
+    <dependencies>
 
-		<!-- log4j -->
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency> -->
-		<!-- /log4j -->
-		
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-			</plugin>
-			<plugin>
-		          <artifactId>maven-source-plugin</artifactId>
-		    </plugin>
-		</plugins>
-	</build>
+        <dependency>
+            <groupId>${project-group-id}</groupId>
+            <version>${project-group-version}</version>
+            <artifactId>common-base</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- json -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+        <!-- /json -->
+
+    </dependencies>
 </project>

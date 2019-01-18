@@ -1,36 +1,27 @@
 <?xml version="1.0"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-		 xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>top.wboost</groupId>
-    <artifactId>common-message-queue</artifactId>
-      <version>3.1.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>common-message-queue-redis</artifactId>
-  <name>common-message-queue-redis</name>
-<dependencies>
-	<dependency>
-		<groupId>${project-group-id}</groupId>
-		<artifactId>common-message-queue-base</artifactId>
-		<version>${project-group-version}</version>
-	</dependency>
-	<dependency>
-			<groupId>${project-group-id}</groupId>
-			<version>${project-group-version}</version>
-			<artifactId>common-cache</artifactId>
-			<scope>compile</scope>
-		</dependency>
-</dependencies>
-<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-			</plugin>
-			<plugin>
-		          <artifactId>maven-source-plugin</artifactId>
-		    </plugin>
-		</plugins>
-	</build>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.wboost</groupId>
+        <artifactId>common-message-queue</artifactId>
+        <version>3.1.7-SNAPSHOT</version>
+    </parent>
+    <artifactId>common-message-queue-redis</artifactId>
+    <name>common-message-queue-redis</name>
+    <properties>
+        <main.basedir>${basedir}/../</main.basedir>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project-group-id}</groupId>
+            <artifactId>common-message-queue-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project-group-id}</groupId>
+            <artifactId>common-cache</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>

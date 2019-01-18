@@ -1,24 +1,27 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>top.wboost</groupId>
-		<artifactId>common</artifactId>
-		<version>3.1.7-SNAPSHOT</version>
-	</parent>
-	<artifactId>common-es</artifactId>
-	<packaging>pom</packaging>
-	<build />
-	<modules>
-		<module>common-es-2.4.1</module>
-		<module>common-es-5.5.2</module>
-	</modules>
-	<dependencies>
-		<dependency>
-			<groupId>${project-group-id}</groupId>
-			<version>${project-group-version}</version>
-			<artifactId>common-web</artifactId>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>top.wboost</groupId>
+        <artifactId>common</artifactId>
+        <version>3.1.7-SNAPSHOT</version>
+    </parent>
+    <artifactId>common-es</artifactId>
+    <packaging>pom</packaging>
+    <build/>
+    <properties>
+        <main.basedir>${basedir}/../</main.basedir>
+    </properties>
+    <modules>
+        <module>common-es-2.4.1</module>
+        <module>common-es-5.5.2</module>
+    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>${project-group-id}</groupId>
+            <version>${project-group-version}</version>
+            <artifactId>common-web</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
