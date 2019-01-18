@@ -26,7 +26,6 @@
 		<dependency>
 		    <groupId>top.wboost</groupId>
 		    <artifactId>common-sql</artifactId>
-		    <version>${project-group-version}</version>
 		</dependency>
 	</dependencies>
 </project>
