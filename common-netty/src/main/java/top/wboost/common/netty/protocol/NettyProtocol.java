@@ -1,5 +1,9 @@
 package top.wboost.common.netty.protocol;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import top.wboost.common.base.enums.CharsetEnum;
 
 import java.util.Arrays;
@@ -16,6 +20,12 @@ import java.util.Arrays;
  * </pre>
  */
 public class NettyProtocol {
+
+    public static void addHandler(SocketChannel socketChannel) {
+        socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(NettyConstant.MAX_BYTES, Unpooled.copiedBuffer(NettyConstant.END_DATA)));
+        socketChannel.pipeline().addLast(new NettyEncoder());
+        socketChannel.pipeline().addLast(new NettyDecoder());
+    }
 	/**
 	 * 消息的开头的信息标志
 	 */
@@ -25,9 +35,13 @@ public class NettyProtocol {
 	 */
 	private int contentLength;
 	/**
-	 * 消息的内容
-	 */
-	private byte[] content;
+     * 消息的结尾信息标志
+     */
+    private ByteBuf end_data = Unpooled.copiedBuffer(NettyConstant.END_DATA);
+    /**
+     * 消息的内容
+     */
+    private byte[] content;
  
 	/**
 	 * 用于初始化，NettyProtocol
@@ -70,7 +84,11 @@ public class NettyProtocol {
 	public void setContent(byte[] content) {
 		this.content = content;
 	}
- 
+
+    public ByteBuf getEnd_data() {
+        return end_data;
+    }
+
 	@Override
 	public String toString() {
 		return "SmartCarProtocol [head_data=" + head_data + ", contentLength="

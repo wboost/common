@@ -28,5 +28,7 @@ public class NettyEncoder extends MessageToByteEncoder<NettyProtocol> {
 		out.writeInt(msg.getContentLength());
 		// 3.写入消息的内容(byte[]类型)
 		out.writeBytes(msg.getContent());
+		// 4.写入结尾标志
+		out.writeBytes(msg.getEnd_data());
 	}
 }

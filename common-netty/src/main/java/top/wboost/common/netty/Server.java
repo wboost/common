@@ -10,8 +10,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import top.wboost.common.netty.protocol.NettyDecoder;
-import top.wboost.common.netty.protocol.NettyEncoder;
+import top.wboost.common.netty.protocol.NettyConstant;
+import top.wboost.common.netty.protocol.NettyProtocol;
 
 public class Server {
 
@@ -22,10 +22,10 @@ public class Server {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
+
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new NettyEncoder());
-                            socketChannel.pipeline().addLast(new NettyDecoder());
+                            NettyProtocol.addHandler(socketChannel);
                             socketChannel.pipeline().addLast(new ServerHandler());
                         }
                     })
@@ -39,9 +39,9 @@ public class Server {
                      * 所以，如果backlog过小，可能会出现accept速度跟不上，A、B队列满了，导致新的客户端无法连接。要注意的是，backlog对程序支持的 
                      * 连接数并无影响，backlog影响的只是还没有被accept取出的连接 
                      */
-                    .option(ChannelOption.SO_BACKLOG, 1024)//设置TCP缓冲区  
-                    .option(ChannelOption.SO_RCVBUF, 32 * 1024)//设置接受数据缓冲大小  
-                    .option(ChannelOption.SO_SNDBUF, 32 * 1024)//设置发送数据缓冲大小  
+                    .option(ChannelOption.SO_BACKLOG, NettyConstant.MAX_BYTES)//设置TCP缓冲区
+                    .option(ChannelOption.SO_RCVBUF, NettyConstant.MAX_BYTES)//设置接受数据缓冲大小
+                    .option(ChannelOption.SO_SNDBUF, NettyConstant.MAX_BYTES)//设置发送数据缓冲大小
                     .option(ChannelOption.SO_KEEPALIVE, true); //保持连接  
             ChannelFuture future = bootstrap.bind(port).sync();
             future.channel().closeFuture().sync();
