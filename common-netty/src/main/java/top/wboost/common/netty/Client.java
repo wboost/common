@@ -13,6 +13,8 @@ import top.wboost.common.netty.protocol.NettyProtocol;
 
 import java.net.InetSocketAddress;
 
+import static top.wboost.common.netty.protocol.NettyConstant.MAX_BYTES;
+
 public class Client {
 
     public static void main(String[] args) {
@@ -29,7 +31,7 @@ public class Client {
                     });
             ChannelFuture future = bootstrap.connect(new InetSocketAddress("127.0.01", 8765)).sync();
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < (1024 * 3); i++) {
+            for (int i = 0; i < (MAX_BYTES - 8); i++) {
                 sb.append('0');
             }
             /*for (int i = 0; i < (1); i++) {

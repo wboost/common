@@ -5,7 +5,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
- 
+
+import static top.wboost.common.netty.protocol.NettyConstant.MAX_BYTES;
+
 /**
  * <pre>
  * 自己定义的协议
@@ -36,7 +38,7 @@ public class NettyDecoder extends ByteToMessageDecoder {
 			// 防止socket字节流攻击
 			// 防止，客户端传来的数据过大
 			// 因为，太大的数据，是不合理的
-			if (buffer.readableBytes() > 20480) {
+			if (buffer.readableBytes() > MAX_BYTES) {
 				buffer.skipBytes(buffer.readableBytes());
 			}
 
