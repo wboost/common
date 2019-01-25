@@ -1,21 +1,16 @@
 package top.wboost.common.util;
 
+import org.springframework.util.Assert;
+import sun.misc.Unsafe;
+import top.wboost.common.log.entity.Logger;
+import top.wboost.common.log.util.LoggerUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.springframework.util.Assert;
-
-import top.wboost.common.log.entity.Logger;
-import top.wboost.common.log.util.LoggerUtil;
 
 /**
  * 反射工具类
@@ -263,6 +258,16 @@ public class ReflectUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static sun.misc.Unsafe getUnsafe() {
+        try {
+            Field theUnsafeInstance = findField(Unsafe.class, "theUnsafe");
+            theUnsafeInstance.setAccessible(true);
+            return (Unsafe) theUnsafeInstance.get(Unsafe.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
