@@ -52,10 +52,10 @@
 
     <properties>
 
-        <!-- postss -->
+        <!-- project -->
         <project-group-id>top.wboost</project-group-id>
         <project-group-version>3.1.7-SNAPSHOT</project-group-version>
-        <!-- /postss -->
+        <!-- /project -->
 
         <!-- config -->
         <java.version>1.8</java.version>
@@ -73,6 +73,7 @@
         <spring-boot.version>1.5.9.RELEASE</spring-boot.version>
         <spring.version>4.3.6.RELEASE</spring.version>
         <netty.version>4.1.19.Final</netty.version>
+        <slf4j.version>1.7.25</slf4j.version>
         <!-- /frame -->
 
         <!-- tools -->
@@ -214,6 +215,29 @@
                 <version>${commons-io.version}</version>
             </dependency>
             <!-- /common -->
+
+            <!-- slf4j -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <!-- /slf4j -->
 
             <!-- json -->
             <dependency>
