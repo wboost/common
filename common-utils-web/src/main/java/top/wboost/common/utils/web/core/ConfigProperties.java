@@ -69,7 +69,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
     static {
         String location = PropertiesUtil.getProperty(DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_FILE);
         if (StringUtil.notEmpty(location)) {
-            ADD_PROP.add(location);
+            ADD_PROP.addAll(Arrays.asList(location.split(",")));
         }
         ADD_PROP.add(DEFAULT_PROPERTIES);
         ADD_PROP.add(DEFAULT_PROPERTIES_SCAN);
