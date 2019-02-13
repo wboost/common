@@ -22,6 +22,8 @@ import java.util.Arrays;
 public class NettyProtocol {
 
     public static void addHandler(SocketChannel socketChannel) {
+        //LengthFieldBasedFrameDecoder lengthFieldBasedFrameDecoder = new LengthFieldBasedFrameDecoder(1024, 4, 4);
+        //socketChannel.pipeline().addLast(lengthFieldBasedFrameDecoder);
         socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(NettyConstant.MAX_BYTES, Unpooled.copiedBuffer(NettyConstant.END_DATA)));
         socketChannel.pipeline().addLast(new NettyEncoder());
         socketChannel.pipeline().addLast(new NettyDecoder());
@@ -57,7 +59,7 @@ public class NettyProtocol {
 	}
 
 	public NettyProtocol(byte[] content) {
-		this.contentLength = content.length;
+        this.contentLength = content.length;
 		this.content = content;
 	}
  

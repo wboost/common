@@ -18,7 +18,7 @@
 
         <dependency>
             <groupId>${project-group-id}</groupId>
-            <artifactId>common-web</artifactId>
+            <artifactId>common-base</artifactId>
             <scope>compile</scope>
         </dependency>
 

@@ -1,6 +1,7 @@
 package top.wboost.common.netty;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -9,11 +10,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import top.wboost.common.netty.builder.NettyBuilder;
+import top.wboost.common.netty.protocol.NettyConstant;
 import top.wboost.common.netty.protocol.NettyProtocol;
 
 import java.net.InetSocketAddress;
-
-import static top.wboost.common.netty.protocol.NettyConstant.MAX_BYTES;
 
 public class Client {
 
@@ -29,9 +30,9 @@ public class Client {
                             socketChannel.pipeline().addLast(new ClientHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.connect(new InetSocketAddress("127.0.01", 8765)).sync();
+            ChannelFuture future = NettyBuilder.option(bootstrap).connect(new InetSocketAddress("127.0.0.1", 8765)).sync();
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < (MAX_BYTES - 8); i++) {
+            for (int i = 0; i < 1024 - 8 - Unpooled.copiedBuffer(NettyConstant.END_DATA).array().length; i++) {
                 sb.append('0');
             }
             /*for (int i = 0; i < (1); i++) {
