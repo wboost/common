@@ -31,7 +31,7 @@ public class ExcelUtil {
      * 外部导入Excel标准目录数据
      *
      * @param file 导入文件
-     * @return List<Map       <       String       ,               String>>
+     * @return List<Map                                                                                                                               <                                                                                                                               String                                                                                                                               ,                                                                                                                                                                                                                                                               String>>
      */
     public static List<Map<String, String>> importExcel(MultipartFile file) throws Exception {
         return readExcel(file.getInputStream());
@@ -109,7 +109,7 @@ public class ExcelUtil {
      * @param beginRow 首行
      * @param lastRow  末行
      * @param sheet    sheet
-     * @return List<Map       <       String       ,               String>>
+     * @return List<Map                                                                                                                               <                                                                                                                               String                                                                                                                               ,                                                                                                                                                                                                                                                               String>>
      */
     private static List<Map<String, String>> readExcel(int beginRow, int lastRow, Sheet sheet) {
         List<Map<String, String>> list = new ArrayList<>();
