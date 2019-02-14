@@ -2,6 +2,7 @@ package top.wboost.common.util;
 
 import org.springframework.util.Assert;
 import sun.misc.Unsafe;
+import top.wboost.common.compiler.CompilerUtils;
 import top.wboost.common.log.entity.Logger;
 import top.wboost.common.log.util.LoggerUtil;
 
@@ -268,6 +269,16 @@ public class ReflectUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static String classGen = "public class [cname] implements java.util.concurrent.Callable<Object> {public Object call() throws Exception {[run]}}";
+
+    @SuppressWarnings("unchecked")
+    public static Object compiler(String code) throws Exception {
+        String cname = "RuntimeCompiler" + RandomUtil.getUuid();
+        Class clz = CompilerUtils.CACHED_COMPILER.loadFromJava(cname, classGen.replace("[cname]", cname).replace("[run]", code));
+        java.util.concurrent.Callable<Object> callable = (java.util.concurrent.Callable) clz.newInstance();
+        return callable.call();
     }
 
 }
