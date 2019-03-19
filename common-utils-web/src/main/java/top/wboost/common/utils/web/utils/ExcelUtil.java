@@ -1,17 +1,14 @@
-package top.wboost.common.utils.web.utils;
+package com.chinaoly.resourcecatalog.standardcatalog.utils;
 
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import jxl.write.*;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -24,7 +21,7 @@ import java.util.*;
  */
 public class ExcelUtil {
     private static final String EMPTY = "";
-    private static final String SHEET_NAME = "Sheet1";
+    private static final String DEFAULT_SHEET_NAME = "Sheet1";
     private static final int DEFAULT_BEGIN_ROW = -1;
     private static Integer sheetColumnWidth;
 
@@ -66,7 +63,10 @@ public class ExcelUtil {
                 beginRow = sheet.getFirstRowNum();
 
             if((lastRow = sheet.getLastRowNum()) == 0 && beginRow == 0){
-                continue;
+				Row row = sheet.getRow(0);
+				if(row == null){
+					continue;
+				}
             }
             list.addAll(readExcel(beginRow,lastRow,sheet));
         }
@@ -90,7 +90,7 @@ public class ExcelUtil {
      * @throws Exception
      */
     public static Map<String,List<Map<String, String>>> readExcelFromSheets(InputStream fileStream,
-                                                                            Integer beginRow) throws Exception {
+                                                                Integer beginRow) throws Exception {
         Workbook workbook = WorkbookFactory.create(fileStream);
         Map<String,List<Map<String, String>>> sheetsMap = new HashMap<>();
         int sheetNum = workbook.getNumberOfSheets();
@@ -101,7 +101,10 @@ public class ExcelUtil {
                 beginRow = sheet.getFirstRowNum();
 
             if((lastRow = sheet.getLastRowNum()) == 0 && beginRow == 0){
-                continue;
+                Row row = sheet.getRow(0);
+				if(row == null){
+					continue;
+				}
             }
             sheetsMap.put(sheet.getSheetName(),readExcel(beginRow,lastRow,sheet));
         }
@@ -146,7 +149,7 @@ public class ExcelUtil {
      */
     public static void exportExcelToHtml(List<Map<String, Object>> list, String[] titles, String[] titleCode,
                                          String fileName, HttpServletResponse response) {
-        exportExcelToHtml(list,titles,titleCode,fileName,SHEET_NAME,response);
+        exportExcelToHtml(list,titles,titleCode,fileName,DEFAULT_SHEET_NAME,response);
     }
 
     /**
@@ -163,7 +166,7 @@ public class ExcelUtil {
         WritableWorkbook workbook = null;
         OutputStream os = null;
         try {
-            response.setContentType("application/msexcel;charset=utf-8");
+            response.setContentType("application/ms-excel;charset=utf-8");
             response.setHeader("Pragma", "No-cache");
             response.setHeader("Cache-Control", "no-cache");
             response.setHeader("Content-Disposition",
@@ -257,7 +260,7 @@ public class ExcelUtil {
      * @param os 输出流
      */
     public static void axleDraw(List<Map<String, String>> dataSource, OutputStream os){
-        axleDraw(dataSource,null,os,SHEET_NAME,new ArrayList<>());
+        axleDraw(dataSource,null,os,DEFAULT_SHEET_NAME,new ArrayList<>());
     }
 
     /**
@@ -279,7 +282,7 @@ public class ExcelUtil {
      */
     public static void axleDraw(List<Map<String, String>> dataSource, OutputStream os,
                                 List<String[]> titles){
-        axleDraw(dataSource,null,os,SHEET_NAME,titles);
+        axleDraw(dataSource,null,os,DEFAULT_SHEET_NAME,titles);
     }
 
     /**
@@ -302,7 +305,7 @@ public class ExcelUtil {
      */
     public static void axleDraw(List<Map<String, String>> dataSource,Map<String, Object> remarkSource,
                                 OutputStream os){
-        axleDraw(dataSource,remarkSource,os,SHEET_NAME,new ArrayList<>());
+        axleDraw(dataSource,remarkSource,os,DEFAULT_SHEET_NAME,new ArrayList<>());
     }
 
     /**
@@ -326,7 +329,7 @@ public class ExcelUtil {
      */
     public static void axleDraw(List<Map<String, String>> dataSource,Map<String, Object> remarkSource,
                                 OutputStream os,List<String[]> titles){
-        axleDraw(dataSource,remarkSource,os,SHEET_NAME,titles);
+        axleDraw(dataSource,remarkSource,os,DEFAULT_SHEET_NAME,titles);
     }
 
     /**
@@ -445,7 +448,7 @@ public class ExcelUtil {
      * @param os 输出流
      */
     public static void axleDraw(Map<String,List<Map<String, String>>> dataSource,
-                                Map<String,Map<String, Object>> remarkSource, OutputStream os, Map<String,List<String[]>> titles){
+        Map<String,Map<String, Object>> remarkSource, OutputStream os, Map<String,List<String[]>> titles){
         axleDraw(dataSource,remarkSource,os,(String[])dataSource.keySet().toArray(),titles);
     }
 
@@ -458,8 +461,8 @@ public class ExcelUtil {
      * @param os 输出流
      */
     public static void axleDraw(Map<String,List<Map<String, String>>> dataSource,
-                                Map<String,Map<String, Object>> remarkSource, OutputStream os, String[] sheetNames,
-                                Map<String,List<String[]>> titles){
+        Map<String,Map<String, Object>> remarkSource, OutputStream os, String[] sheetNames,
+        Map<String,List<String[]>> titles){
         Workbook wb = createWorkbook(sheetNames,titles);
         axleDraw(dataSource,remarkSource,os,wb,titles);
     }
@@ -473,8 +476,8 @@ public class ExcelUtil {
      * @param os 输出流
      */
     public static void axleDraw(Map<String,List<Map<String, String>>> dataSource,
-                                Map<String,Map<String, Object>> remarkSource, OutputStream os, Workbook wb,
-                                Map<String,List<String[]>> titles){
+                Map<String,Map<String, Object>> remarkSource, OutputStream os, Workbook wb,
+                Map<String,List<String[]>> titles){
         //OutputStream os = setResponseHeader(response,fileName);
         try {
             createFixationSheet(dataSource,remarkSource,os,wb,titles);
@@ -494,8 +497,8 @@ public class ExcelUtil {
      * @throws IOException
      */
     private static void createFixationSheet(Map<String,List<Map<String, String>>> dataSource,
-                                            Map<String,Map<String, Object>> remarkSource, OutputStream os, Workbook wb,
-                                            Map<String,List<String[]>> titles) throws IOException{
+            Map<String,Map<String, Object>> remarkSource, OutputStream os, Workbook wb,
+            Map<String,List<String[]>> titles) throws IOException{
         CellStyle style = createCellRedStyle(wb); // 样式对象
         for(String sheetKey : dataSource.keySet()){
             if(!containsSheet(wb,sheetKey)){
@@ -537,8 +540,8 @@ public class ExcelUtil {
      * @return OutputStream
      * @throws IOException io流异常
      */
-    private static OutputStream setResponseHeader(HttpServletResponse response, String fileName) throws IOException{
-        response.setContentType("application/msexcel;charset=utf-8");
+    public static OutputStream setResponseHeader(HttpServletResponse response, String fileName) throws IOException{
+        response.setContentType("application/ms-excel;charset=utf-8");
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Content-Disposition",
@@ -551,7 +554,7 @@ public class ExcelUtil {
      * @return Workbook
      */
     public static Workbook createWorkbook(){
-        return createWorkbook(SHEET_NAME,new ArrayList<>());
+        return createWorkbook(DEFAULT_SHEET_NAME,new ArrayList<>());
     }
 
     /**
@@ -569,7 +572,7 @@ public class ExcelUtil {
      * @return Workbook
      */
     public static Workbook createWorkbook(List<String[]> titles){
-        return createWorkbook(SHEET_NAME,titles);
+        return createWorkbook(DEFAULT_SHEET_NAME,titles);
     }
 
     /**
