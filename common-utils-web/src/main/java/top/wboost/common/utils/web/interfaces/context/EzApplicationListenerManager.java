@@ -1,7 +1,5 @@
 package top.wboost.common.utils.web.interfaces.context;
 
-import java.util.*;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -9,12 +7,15 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
-
 import org.springframework.core.OrderComparator;
-import top.wboost.common.util.AnnotationUtil;
+import org.springframework.core.Ordered;
 import top.wboost.common.utils.web.utils.SpringApplicationUtil;
 
-public interface EzApplicationListenerManager extends ApplicationListener<ApplicationEvent> {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+public interface EzApplicationListenerManager extends ApplicationListener<ApplicationEvent>, Ordered {
 
 	default void onApplicationEvent(ApplicationEvent event) {
 		if (event instanceof ContextClosedEvent) {
@@ -28,6 +29,10 @@ public interface EzApplicationListenerManager extends ApplicationListener<Applic
 		} else {
 			// TODO
 		}
+	}
+
+	default int getOrder() {
+		return Ordered.HIGHEST_PRECEDENCE + 10;
 	}
 
 	default void onContextStoppedEvent(ContextStoppedEvent event) {

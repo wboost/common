@@ -15,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySources;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.util.StringValueResolver;
@@ -59,7 +60,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
     public static final String DEFAULT_PROPERTIES_SCAN = "classpath:properties/*.properties";
     public static final String DEFAULT_CONFIG_FILE = "classpath:properties/config.properties";
     public static final String DEFAULT_CONFIG_NAME = "sys.properties";
-    public static StandardServletEnvironment localenv = new StandardServletEnvironment();
+    private static StandardServletEnvironment localenv = new StandardServletEnvironment();
     public static StringValueResolver resolver = null;
     private static Logger log = LoggerUtil.getLogger(PropertiesUtil.class);
     private static Set<String> ADD_PROP = new HashSet<>();
@@ -80,7 +81,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
             try {
                 Resource[] resources = resourceResolver.getResources(path);
                 for (Resource resource : resources) {
-                    localenv.getPropertySources().addLast(new ResourcePropertySource(resource));
+                    localenv.getPropertySources().addLast(new ResourcePropertySource(new EncodedResource(resource, CharsetEnum.UTF_8.getCharset())));
                 }
             } catch (IOException e) {
                 log.warn(e.getLocalizedMessage());
@@ -88,7 +89,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         });
     }
 
-    private Environment environment;
+    public static StandardServletEnvironment environment;
 
     private PropertySourcesPlaceholderConfigurer configPropertySourcesPlaceholderConfigurer(
             ConfigurableListableBeanFactory beanFactory) {
@@ -169,7 +170,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         String[] propertiesAwares = beanFactory.getBeanNamesForType(PropertiesAware.class);
         Arrays.asList(propertiesAwares).forEach(propertiesAwareName -> beanFactory.getBean(propertiesAwareName, PropertiesAware.class).setProperties(localenv));
         mergeProperties(configurer);
-        PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(localenv.getPropertySources());
+        PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(configurer.getAppliedPropertySources());
         boolean trimValues = false;
         boolean ignoreUnresolvablePlaceholders = false;
         beanFactory.addEmbeddedValueResolver((strVal -> {
@@ -185,7 +186,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
 
     @Override
     public void setEnvironment(Environment environment) {
-        this.environment = environment;
+        this.environment = (StandardServletEnvironment) environment;
     }
 
     @Override

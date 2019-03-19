@@ -6,7 +6,7 @@
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
     <name>common</name>
-    <version>3.1.8-SNAPSHOT</version>
+    <version>3.1.9-SNAPSHOT</version>
     <description>project auto plugins</description>
     <url>http://www.wboost.top</url>
     <developers>
@@ -54,7 +54,7 @@
 
         <!-- project -->
         <project-group-id>top.wboost</project-group-id>
-        <project-group-version>3.1.8-SNAPSHOT</project-group-version>
+        <project-group-version>3.1.9-SNAPSHOT</project-group-version>
         <!-- /project -->
 
         <!-- config -->
@@ -72,7 +72,7 @@
         <!-- frame -->
         <spring-boot.version>1.5.9.RELEASE</spring-boot.version>
         <spring.version>4.3.6.RELEASE</spring.version>
-        <netty.version>4.1.19.Final</netty.version>
+        <netty.version>4.1.33.Final</netty.version>
         <slf4j.version>1.7.25</slf4j.version>
         <!-- /frame -->
 
@@ -296,6 +296,54 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-epoll</artifactId>
                 <version>${netty.version}</version>
             </dependency>
 

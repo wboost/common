@@ -1,9 +1,6 @@
 package top.wboost.common.util;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 集合工具类
@@ -40,11 +37,22 @@ public class CollectionUtil {
     }
 
     public static boolean isEmpty(Map<?, ?> map) {
-        if (map == null || map.size() == 0) {
-            return true;
+        return map == null || map.size() == 0;
+    }
+
+    public static <T> List<List<T>> splitCollection(List<T> calculateResultList, Class<T> clazz, int splitNum) {
+        List<List<T>> calculateApiResults = new ArrayList<>();
+        int once = calculateResultList.size() / (splitNum - 1);
+        if (once == 0) {
+            calculateApiResults.add(calculateResultList);
         } else {
-            return false;
+            int now = 0;
+            while (now <= calculateResultList.size()) {
+                calculateApiResults.add(calculateResultList.subList(now, now + once > calculateResultList.size() ? calculateResultList.size() : now + once));
+                now += once;
+            }
         }
+        return calculateApiResults;
     }
 
 }

@@ -33,10 +33,16 @@ import java.util.Set;
 @SuppressWarnings("RefusedBequest")
 class MyJavaFileManager implements JavaFileManager {
     private final StandardJavaFileManager fileManager;
+    private ClassLoader classLoader = null;
     private final Map<String, ByteArrayOutputStream> buffers = new LinkedHashMap<String, ByteArrayOutputStream>();
 
     MyJavaFileManager(StandardJavaFileManager fileManager) {
+        this(fileManager, null);
+    }
+
+    MyJavaFileManager(StandardJavaFileManager fileManager, ClassLoader classLoader) {
         this.fileManager = fileManager;
+        this.classLoader = classLoader;
     }
 
     public Iterable<Set<Location>> listLocationsForModules(final Location location) throws IOException {
@@ -48,7 +54,9 @@ class MyJavaFileManager implements JavaFileManager {
     }
 
     public ClassLoader getClassLoader(Location location) {
-        return fileManager.getClassLoader(location);
+        ClassLoader classLoaderUse = classLoader == null ? fileManager.getClassLoader(location) : classLoader;
+        System.out.println("use classLoader " + classLoaderUse);
+        return classLoaderUse;
     }
 
     public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {

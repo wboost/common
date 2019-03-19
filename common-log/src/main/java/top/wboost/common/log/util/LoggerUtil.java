@@ -1,13 +1,20 @@
 package top.wboost.common.log.util;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.FileAppender;
+import ch.qos.logback.core.OutputStreamAppender;
+import ch.qos.logback.core.spi.AppenderAttachableImpl;
+import ch.qos.logback.core.util.COWArrayList;
+import org.slf4j.LoggerFactory;
+import top.wboost.common.log.entity.Logger;
+import top.wboost.common.log.entity.LoggerTemplate;
+import top.wboost.common.util.ReflectUtil;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
-import org.slf4j.LoggerFactory;
-
-import top.wboost.common.log.entity.Logger;
-import top.wboost.common.log.entity.LoggerTemplate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 日志工具类
@@ -27,6 +34,29 @@ public class LoggerUtil {
         return (Logger) Proxy.newProxyInstance(LoggerTemplate.class.getClassLoader(),
                 LoggerTemplate.class.getInterfaces(), new LoggerInvocationHandler(LoggerFactory.getLogger(clazz)));
     }
+
+    /**
+     * logback file
+     *
+     * @return
+     */
+    public static List<String> getLoggerFile() {
+        org.slf4j.Logger logger = LoggerFactory.getLogger(LoggerUtil.class);
+        LoggerContext loggerContext = ReflectUtil.getFieldValue(logger, "loggerContext", LoggerContext.class);
+        org.slf4j.Logger root = ReflectUtil.getFieldValue(loggerContext, "root", org.slf4j.Logger.class);
+        AppenderAttachableImpl aai = ReflectUtil.getFieldValue(root, "aai", AppenderAttachableImpl.class);
+        COWArrayList<OutputStreamAppender> appenderList = ReflectUtil.getFieldValue(aai, "appenderList", COWArrayList.class);
+        List<String> logFiles = new ArrayList<>();
+        appenderList.forEach(appender -> {
+            if (appender instanceof FileAppender) {
+                FileAppender rollingFileAppender = (FileAppender) appender;
+                logFiles.add(rollingFileAppender.getFile());
+            }
+        });
+        return logFiles;
+    }
+
+
 
 }
 

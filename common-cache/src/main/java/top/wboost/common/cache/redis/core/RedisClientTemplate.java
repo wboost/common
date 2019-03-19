@@ -1,24 +1,17 @@
 package top.wboost.common.cache.redis.core;
 
+import redis.clients.jedis.BinaryClient.LIST_POSITION;
+import redis.clients.jedis.*;
+import redis.clients.jedis.params.geo.GeoRadiusParam;
+import redis.clients.jedis.params.sortedset.ZAddParams;
+import redis.clients.jedis.params.sortedset.ZIncrByParams;
+import top.wboost.common.cache.redis.MyJedisCommands;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import redis.clients.jedis.BinaryClient.LIST_POSITION;
-import redis.clients.jedis.BitPosParams;
-import redis.clients.jedis.GeoCoordinate;
-import redis.clients.jedis.GeoRadiusResponse;
-import redis.clients.jedis.GeoUnit;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
-import redis.clients.jedis.SortingParams;
-import redis.clients.jedis.Tuple;
-import redis.clients.jedis.params.geo.GeoRadiusParam;
-import redis.clients.jedis.params.sortedset.ZAddParams;
-import redis.clients.jedis.params.sortedset.ZIncrByParams;
-import top.wboost.common.cache.redis.MyJedisCommands;
 
 /**
  * redis发送模版,使用动态代理调用官方所有方法,没有实际方法
@@ -1682,4 +1675,48 @@ public class RedisClientTemplate implements MyJedisCommands {
         return null;
     }
 
+    @Override
+    public Object eval(String s, int i, String... strings) {
+        return null;
+    }
+
+    @Override
+    public Object eval(String s, List<String> list, List<String> list1) {
+        return null;
+    }
+
+    @Override
+    public Object eval(String s) {
+        return null;
+    }
+
+    @Override
+    public Object evalsha(String s) {
+        return null;
+    }
+
+    @Override
+    public Object evalsha(String s, List<String> list, List<String> list1) {
+        return null;
+    }
+
+    @Override
+    public Object evalsha(String s, int i, String... strings) {
+        return null;
+    }
+
+    @Override
+    public Boolean scriptExists(String s) {
+        return null;
+    }
+
+    @Override
+    public List<Boolean> scriptExists(String... strings) {
+        return null;
+    }
+
+    @Override
+    public String scriptLoad(String s) {
+        return null;
+    }
 }

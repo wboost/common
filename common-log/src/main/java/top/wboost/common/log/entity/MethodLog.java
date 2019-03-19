@@ -52,6 +52,19 @@ public class MethodLog extends BaseLog {
     /**错误码**/
     private Integer exceptionCode;
 
+    /**
+     * 方法详细说明
+     */
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public static MethodLog buildLog() {
         return new MethodLog();
     }

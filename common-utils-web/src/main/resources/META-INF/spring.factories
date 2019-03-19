@@ -1,0 +1,2 @@
+org.springframework.boot.env.PropertySourceLoader=\
+top.wboost.common.utils.web.core.PropertiesEncodePropertySourceLoader

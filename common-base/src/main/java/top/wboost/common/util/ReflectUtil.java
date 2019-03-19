@@ -1,10 +1,9 @@
 package top.wboost.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import sun.misc.Unsafe;
-import top.wboost.common.compiler.CompilerUtils;
-import top.wboost.common.log.entity.Logger;
-import top.wboost.common.log.util.LoggerUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -26,7 +25,7 @@ public class ReflectUtil {
         get, set
     }
 
-    private static Logger log = LoggerUtil.getLogger(ReflectUtil.class);
+    private static Logger log = LoggerFactory.getLogger(ReflectUtil.class);
 
     /**
      * 获得泛型类型
@@ -261,7 +260,7 @@ public class ReflectUtil {
         return null;
     }
 
-    public static sun.misc.Unsafe getUnsafe() {
+    public static Unsafe getUnsafe() {
         try {
             Field theUnsafeInstance = findField(Unsafe.class, "theUnsafe");
             theUnsafeInstance.setAccessible(true);
@@ -271,14 +270,13 @@ public class ReflectUtil {
         }
     }
 
-    static String classGen = "public class [cname] implements java.util.concurrent.Callable<Object> {public Object call() throws Exception {[run]}}";
+    //static String classGen = "public class [cname] implements java.util.concurrent.Callable<Object> {public Object call() throws Exception {[run]}}";
 
-    @SuppressWarnings("unchecked")
-    public static Object compiler(String code) throws Exception {
+    /*public static Object compiler(String code) throws Exception {
         String cname = "RuntimeCompiler" + RandomUtil.getUuid();
         Class clz = CompilerUtils.CACHED_COMPILER.loadFromJava(cname, classGen.replace("[cname]", cname).replace("[run]", code));
         java.util.concurrent.Callable<Object> callable = (java.util.concurrent.Callable) clz.newInstance();
         return callable.call();
-    }
+    }*/
 
 }

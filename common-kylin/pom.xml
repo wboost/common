@@ -4,7 +4,7 @@
     <parent>
         <groupId>top.wboost</groupId>
         <artifactId>common</artifactId>
-        <version>3.1.8-SNAPSHOT</version>
+        <version>3.1.9-SNAPSHOT</version>
     </parent>
     <artifactId>common-kylin</artifactId>
     <properties>
@@ -33,6 +33,10 @@
             <groupId>${project-group-id}</groupId>
             <artifactId>common-sql</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
     </dependencies>
 </project>

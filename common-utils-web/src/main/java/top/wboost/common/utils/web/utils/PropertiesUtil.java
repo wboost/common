@@ -53,10 +53,14 @@ public class PropertiesUtil {
             if (!StringUtil.notEmpty(path)) {
                 if (ConfigProperties.resolver != null) {
                     val = ConfigProperties.resolver.resolveStringValue("${" + name + "}");
-                    if (val != null)
+                    /*if (val != null)
                         val = new String(val.getBytes(CharsetEnum.ISO_8859_1.getName()),
-                                CharsetEnum.UTF_8.getCharset());
-                } else {
+                                CharsetEnum.UTF_8.getCharset());*/
+                }
+                if (("${" + name + "}").equals(val)) {
+                    val = null;
+                }
+                /*else {
                     val = ConfigProperties.localenv.getProperty(name, defaultVal);
                 }
                 if (("${" + name + "}").equals(val)) {
@@ -64,7 +68,7 @@ public class PropertiesUtil {
                     if (("${" + name + "}").equals(val)) {
                         val = null;
                     }
-                }
+                }*/
             } else {
                 try {
                     EncodedResource[] resources = loadResources(path);
@@ -129,7 +133,7 @@ public class PropertiesUtil {
 
     public static Map<String, Object> getAllProperties() {
         Map<String, Object> retMap = new NoConverterMap<>();
-        Iterator<PropertySource<?>> ite = ConfigProperties.localenv.getPropertySources()
+        Iterator<PropertySource<?>> ite = ConfigProperties.environment.getPropertySources()
                 .iterator();
         while (ite.hasNext()) {
             PropertySource<?> s = ite.next();

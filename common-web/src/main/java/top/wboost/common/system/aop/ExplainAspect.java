@@ -1,26 +1,14 @@
 package top.wboost.common.system.aop;
 
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
 import top.wboost.common.annotation.Explain;
 import top.wboost.common.base.annotation.AutoWebApplicationConfig;
 import top.wboost.common.base.entity.ResultEntity;
@@ -38,6 +26,11 @@ import top.wboost.common.system.exception.SystemCodeException;
 import top.wboost.common.util.ResponseUtil;
 import top.wboost.common.utils.web.interfaces.context.EzWebApplicationListener;
 import top.wboost.common.utils.web.utils.HtmlUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * 控制层aop执行类
@@ -174,7 +167,13 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 .setRequestUri(request.getRequestURI()).setMethodName(methodName)
                 .setExceptionCode(hasSystemErrorCode ? explain.systemCode().getCode() : explain.exceptionCode())
                 .setStatus(logStatus.key).setTitle(explain.value());
+        /*if (StringUtil.notEmpty(explain.description())) {
+            try {
+                JSONObject jsonObject = JSONObject.parseObject(params);
+            } catch (Exception e) {
 
+            }
+        }*/
         return methodLog;
     }
 

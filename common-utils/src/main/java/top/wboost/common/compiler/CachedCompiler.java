@@ -135,7 +135,7 @@ public class CachedCompiler implements Closeable {
         MyJavaFileManager fileManager = fileManagerMap.get(classLoader);
         if (fileManager == null) {
             StandardJavaFileManager standardJavaFileManager = s_compiler.getStandardFileManager(null, null, null);
-            fileManagerMap.put(classLoader, fileManager = new MyJavaFileManager(standardJavaFileManager));
+            fileManagerMap.put(classLoader, fileManager = new MyJavaFileManager(standardJavaFileManager, classLoader));
         }
         for (Map.Entry<String, byte[]> entry : compileFromJava(className, javaCode, printWriter, fileManager).entrySet()) {
             String className2 = entry.getKey();

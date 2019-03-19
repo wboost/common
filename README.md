@@ -3,7 +3,7 @@
 
 [Home Page](http://www.wboost.top) | [官方主页](http://www.wboost.top) | [中文说明]() | [文档手册](http://www.wboost.top/framework/spring-boot-starter-support/docs)
 ------
-[![Packagist](http://www.wboost.top/svg/version-3.1.7.RELEASE-brightgreen.svg)](http://www.wboost.top)
+[![Packagist](http://www.wboost.top/svg/version-3.1.9-SNAPSHOT-brightgreen.svg)](http://www.wboost.top)
 
 [![Packagist](http://www.wboost.top/svg/spring-4.3.13.RELEASE-brightgreen.svg)](http://www.wboost.top)    [![Packagist](http://www.wboost.top/svg/springboot-1.5.9.RELEASE-brightgreen.svg)](http://www.wboost.top)   ![Packagist](http://www.wboost.top/svg/hibernate-5.0.12.Final-brightgreen.svg)
 ------
@@ -26,7 +26,7 @@
 ```
 <properties>
 <tools-group-id>top.wboost</tools-group-id>
-<tools-group-version>3.1.7.RELEASE</tools-group-version>
+<tools-group-version>3.1.9-SNAPSHOT</tools-group-version>
 </properties>
 ```
 
