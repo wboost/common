@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>top.wboost</groupId>
 		<artifactId>common-message-queue</artifactId>
-        <version>3.1.9.RELEASE</version>
+        <version>3.2.0.RELEASE</version>
 	</parent>
 	<artifactId>common-message-queue-activemq</artifactId>
 	<name>common-message-queue-activemq</name>

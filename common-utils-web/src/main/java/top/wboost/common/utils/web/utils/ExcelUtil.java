@@ -1,14 +1,17 @@
-package com.chinaoly.resourcecatalog.standardcatalog.utils;
+package top.wboost.common.utils.web.utils;
 
-import jxl.write.*;
-import org.apache.poi.hssf.usermodel.*;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.lang.Boolean;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.DateFormat;
