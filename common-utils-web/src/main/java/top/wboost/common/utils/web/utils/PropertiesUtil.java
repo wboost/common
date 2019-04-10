@@ -3,6 +3,7 @@ package top.wboost.common.utils.web.utils;
 import org.springframework.boot.env.PropertySourcesLoader;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -133,11 +134,14 @@ public class PropertiesUtil {
 
     public static Map<String, Object> getAllProperties() {
         Map<String, Object> retMap = new NoConverterMap<>();
-        Iterator<PropertySource<?>> ite = ConfigProperties.environment.getPropertySources()
-                .iterator();
-        while (ite.hasNext()) {
-            PropertySource<?> s = ite.next();
-            retMap.putAll(resolvePropertySource(s));
+        if (ConfigProperties.environment instanceof StandardEnvironment) {
+            StandardEnvironment standardEnvironment = (StandardEnvironment) ConfigProperties.environment;
+            Iterator<PropertySource<?>> ite = standardEnvironment.getPropertySources()
+                    .iterator();
+            while (ite.hasNext()) {
+                PropertySource<?> s = ite.next();
+                retMap.putAll(resolvePropertySource(s));
+            }
         }
         return retMap;
     }

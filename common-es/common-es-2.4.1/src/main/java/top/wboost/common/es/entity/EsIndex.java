@@ -1,16 +1,12 @@
 package top.wboost.common.es.entity;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
-import top.wboost.common.es.enums.IndexField;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * ES索引实体类
@@ -19,28 +15,59 @@ import top.wboost.common.es.enums.IndexField;
  */
 public class EsIndex extends BaseEsIndex {
     private Integer number_of_shards; //分片数  
-    private Integer number_of_replicas; //备份数  
+    private Integer number_of_replicas; //备份数
+    private List<String> alias = null;// 别名
     private Map<String, Set<Field>> fields = new HashMap<>();//字段
 
+    public void addAlias(String alias) {
+        if (this.alias == null) {
+            this.alias = new ArrayList<>();
+        }
+        this.alias.add(alias);
+    }
+
+    private BuilderSupport builderSupport = null;
+    private SettingSupport settingSupport = null;
+
+    public SettingSupport getSettingSupport() {
+        return settingSupport;
+    }
+
+    public EsIndex setSettingSupport(SettingSupport settingSupport) {
+        this.settingSupport = settingSupport;
+        return this;
+    }
+
+    public EsIndex setBuilderSupport(BuilderSupport builderSupport) {
+        this.builderSupport = builderSupport;
+        return this;
+    }
+
+    public BuilderSupport getBuilderSupport() {
+        return builderSupport;
+    }
+
+    public interface BuilderSupport {
+        public void invoke(CreateIndexRequestBuilder createIndexRequestBuilder);
+    }
+
+    public interface SettingSupport {
+        public void invoke(Settings settings);
+    }
     public EsIndex(String index, String type, Integer number_of_shards, Integer number_of_replicas) {
         super(index, type);
         this.number_of_shards = number_of_shards;
         this.number_of_replicas = number_of_replicas;
     }
 
-    public EsIndex putField(String objName, IndexField indexField, String indexFieldType) {
-        Set<String> set = new HashSet<String>();
-        Collections.addAll(set, indexField.valArray);
-        if (!set.contains(indexFieldType)) {
-            throw new IllegalArgumentException("indexFieldType not in indexField");
-        }
-        Field field = new Field(indexField.toString(), indexFieldType);
-        if (fields.containsKey(objName)) {
-            fields.get(objName).add(field);
+    public EsIndex putField(String fieldName, String fieldKey, String fieldValue) {
+        Field field = new Field(fieldKey, fieldValue);
+        if (fields.containsKey(fieldName)) {
+            fields.get(fieldName).add(field);
         } else {
             Set<Field> fieldSet = new HashSet<Field>();
             fieldSet.add(field);
-            fields.put(objName, fieldSet);
+            fields.put(fieldName, fieldSet);
         }
         return this;
     }

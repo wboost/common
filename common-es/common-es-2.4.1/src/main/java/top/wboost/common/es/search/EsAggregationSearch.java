@@ -33,6 +33,24 @@ public class EsAggregationSearch extends EsSearch {
 
     private AggsEntity aggs = new AggsEntity();
 
+    /*private List<AbstractAggregationBuilder> aggsBuilders;
+
+    public List<AbstractAggregationBuilder> getAggsBuilders() {
+        return aggsBuilders;
+    }
+
+    public EsAggregationSearch addAggsBuilder(AbstractAggregationBuilder aggregationBuilder) {
+        if (this.aggsBuilders == null) {
+            this.aggsBuilders = new ArrayList<>();
+        }
+        this.aggsBuilders.add(aggregationBuilder);
+        return this;
+    }
+
+    public void setAggsBuilders(List<AbstractAggregationBuilder> aggsBuilders) {
+        this.aggsBuilders = aggsBuilders;
+    }*/
+
     public EsAggregationSearch(String index, String type) {
         super(index, type);
     }

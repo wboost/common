@@ -9,9 +9,9 @@ import top.wboost.common.base.page.BasePage;
 import top.wboost.common.base.page.PageBuilder;
 import top.wboost.common.es.entity.EsFilter;
 import top.wboost.common.es.entity.EsResultEntity;
-import top.wboost.common.es.search.EsAggregationSearch;
-import top.wboost.common.es.search.EsScrollSearch;
-import top.wboost.common.es.search.EsSearch;
+import top.wboost.common.es.search.*;
+
+import java.util.Arrays;
 
 /**
  * ES查询工具类
@@ -62,24 +62,24 @@ public class EsQueryUtil extends AbstractEsUtil {
 
     /**
      * 使用滚动(Scroll)方式搜索
-     * @param esScrollSearch esScroll实体类
+     * @param esScrollFieldSearch esScroll实体类
      * @param queryPage 查询分页实体类
      * @param filters ES过滤器
      * @return EsResultEntity
      */
-    /*public static EsResultEntity queryScrollFieldList(EsScrollFieldSearch esScrollFieldSearch, BasePage queryPage,
-            EsFilter... filters) {
+    public static EsResultEntity queryScrollFieldList(EsScrollFieldSearch esScrollFieldSearch, BasePage queryPage,
+                                                      EsFilter... filters) {
         QueryBuilder boolQueryBuilder = EsQueryAction.getBoolQueryBuilder(esScrollFieldSearch, filters);
         if (queryPage == null)
             queryPage = countPage;
         SearchRequestBuilder builder = EsQueryAction.getSearchRequestBuilder(esScrollFieldSearch, queryPage,
                 boolQueryBuilder);
         EsQueryAction.addScroll(builder, esScrollFieldSearch.getTimeValue());
-        builder.addFields(esScrollFieldSearch.getFields());
+        Arrays.asList(esScrollFieldSearch.getFields()).forEach(builder::addDocValueField);
         EsResultEntity entity = EsQueryAction.getFieldEsResultEntity(builder, queryPage);
         entity.setTimeValue(esScrollFieldSearch.getTimeValue());
         return entity;
-    }*/
+    }
 
     /**
      * 聚合查询
@@ -91,7 +91,7 @@ public class EsQueryUtil extends AbstractEsUtil {
     public static EsResultEntity queryAggregationList(EsAggregationSearch esAggregationSearch, BasePage queryPage,
             EsFilter... filters) {
         if (queryPage == null)
-            queryPage = countPage;
+            queryPage = PageBuilder.begin().setBeginNumber(0).setPageSize(1).build();
         BoolQueryBuilder boolQueryBuilder = EsQueryAction.getBoolQueryBuilder(esAggregationSearch, filters);
         SearchRequestBuilder builder = EsQueryAction.getSearchRequestBuilder(esAggregationSearch, queryPage,
                 boolQueryBuilder);
@@ -108,15 +108,15 @@ public class EsQueryUtil extends AbstractEsUtil {
      * @param filters ES过滤器
      * @return EsResultEntity
      */
-    /*public static EsResultEntity queryFieldList(EsFieldSearch esFieldSearch, BasePage queryPage, EsFilter... filters) {
+    public static EsResultEntity queryFieldList(EsFieldSearch esFieldSearch, BasePage queryPage, EsFilter... filters) {
         if (queryPage == null)
             queryPage = countPage;
         SearchRequestBuilder builder = EsQueryAction.getSearchRequestBuilder(esFieldSearch, queryPage,
                 EsQueryAction.getBoolQueryBuilder(esFieldSearch, filters));
-        builder.addFields(esFieldSearch.getFields());
+        Arrays.asList(esFieldSearch.getFields()).forEach(builder::addDocValueField);
         EsResultEntity entity = EsQueryAction.getFieldEsResultEntity(builder, queryPage);
         return entity;
-    }*/
+    }
 
     /**
      * 查询数量

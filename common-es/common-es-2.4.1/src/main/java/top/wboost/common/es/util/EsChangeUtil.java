@@ -1,16 +1,16 @@
 package top.wboost.common.es.util;
 
-import java.util.Map;
-
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.settings.Settings;
-
 import top.wboost.common.es.entity.EsIndex;
 import top.wboost.common.es.entity.EsPut;
 import top.wboost.common.util.QuickHashMap;
 import top.wboost.common.util.RandomUtil;
+
+import java.util.Map;
 
 /**
  * ES改变数据工具类
@@ -35,9 +35,15 @@ public class EsChangeUtil extends AbstractEsUtil {
         try {
             Settings settings = Settings.settingsBuilder().put("number_of_shards", index.getNumber_of_shards())
                     .put("number_of_replicas", index.getNumber_of_replicas()).build();
-            client.admin().indices().prepareCreate(index.getFirstIndex()).setSettings(settings).execute().actionGet();
+            if (index.getSettingSupport() != null) {
+                index.getSettingSupport().invoke(settings);
+            }
+            CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices().prepareCreate(index.getFirstIndex()).setSettings(settings);
+            if (index.getBuilderSupport() != null) {
+                index.getBuilderSupport().invoke(createIndexRequestBuilder);
+            }
+            createIndexRequestBuilder.execute().actionGet();
             log.debug(index.getProperties().string());
-            System.out.println(index.getProperties().string());
             PutMappingRequest mappingRequest = Requests.putMappingRequest(index.getFirstIndex())
                     .type(index.getFirstType()).source(index.getProperties());
             return client.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();

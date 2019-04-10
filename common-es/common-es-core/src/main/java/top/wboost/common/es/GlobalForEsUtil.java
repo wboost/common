@@ -44,7 +44,7 @@ public class GlobalForEsUtil {
 
     static {
         try {
-            Assert.notNull(esClusterName, "请检查es.server.clustername是否存在及是否被PropertiesUtil扫描");
+            Assert.notNull(esClusterName, "wwwww请检查es.server.clustername是否存在及是否被PropertiesUtil扫描");
             Assert.notNull(esServerIps, "请检查es.server.ips是否存在及是否被PropertiesUtil扫描");
             Assert.notNull(esServerPort, "请检查es.server.port是否存在及是否被PropertiesUtil扫描");
             if (!StringUtil.notEmpty(ES_CLUSTER_NAME)) {

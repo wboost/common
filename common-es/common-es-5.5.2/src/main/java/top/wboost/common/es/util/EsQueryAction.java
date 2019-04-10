@@ -10,7 +10,6 @@ import org.elasticsearch.action.search.SearchScrollRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.aggregations.ChildrenAggregationBuilder;
-import org.elasticsearch.join.aggregations.InternalChildren;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
@@ -18,15 +17,14 @@ import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.InternalTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.pipeline.bucketselector.BucketSelectorPipelineAggregationBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import top.wboost.common.base.page.BasePage;
+import top.wboost.common.es.aggs.resolver.AggsResolver;
+import top.wboost.common.es.aggs.resolver.InternalTermsResolver;
 import top.wboost.common.es.entity.EsCountFilter;
 import top.wboost.common.es.entity.EsFilter;
 import top.wboost.common.es.entity.EsResultEntity;
@@ -43,6 +41,7 @@ import java.util.*;
 
 /**
  * ES查询各步骤封装,推荐使用EsQueryUtil封装,否则要按步骤来
+ *
  * @author jwSun
  * @date 2017年5月2日 下午4:02:53
  */
@@ -56,10 +55,11 @@ public class EsQueryAction {
 
     /**
      * 1.构建多条件查询builder
-     * @date 2017年5月2日 下午3:47:16
-     * @param search Es查询实体类
+     *
+     * @param search  Es查询实体类
      * @param filters 大小过滤器
      * @return BoolQueryBuilder
+     * @date 2017年5月2日 下午3:47:16
      */
     public static BoolQueryBuilder getBoolQueryBuilder(EsSearch search, EsFilter... filters) {
         try {
@@ -187,41 +187,52 @@ public class EsQueryAction {
     }
 
     protected static void addBuilders(BoolQueryBuilder boolQueryBuilder, EsQueryType esQueryType,
-            List<List<QueryBuilder>> queryBuilders) {
+                                      List<List<QueryBuilder>> queryBuilders) {
         if (queryBuilders == null)
             return;
         switch (esQueryType) {
-        case MUST:
-            queryBuilders.forEach(queryBuilder -> {
-                QueryBuilder bool = getBoolBuilder(queryBuilder);
-                boolQueryBuilder.must(bool);
-            });
-            break;
-        case MUST_NOT:
-            queryBuilders.forEach(queryBuilder -> {
-                QueryBuilder bool = getBoolBuilder(queryBuilder);
-                boolQueryBuilder.mustNot(bool);
-            });
-            break;
-        case SHOULD:
-            queryBuilders.forEach(queryBuilder -> {
-                QueryBuilder bool = getBoolBuilder(queryBuilder);
-                boolQueryBuilder.should(bool);
-            });
-            break;
+            case MUST:
+                queryBuilders.forEach(queryBuilder -> {
+                    QueryBuilder bool = getBoolBuilder(queryBuilder);
+                    boolQueryBuilder.must(bool);
+                });
+                break;
+            case MUST_NOT:
+                queryBuilders.forEach(queryBuilder -> {
+                    QueryBuilder bool = getBoolBuilder(queryBuilder);
+                    boolQueryBuilder.mustNot(bool);
+                });
+                break;
+            case SHOULD:
+                queryBuilders.forEach(queryBuilder -> {
+                    QueryBuilder bool = getBoolBuilder(queryBuilder);
+                    boolQueryBuilder.should(bool);
+                });
+                break;
         }
     }
 
     /**
+     * 判断index是否存在
+     *
+     * @param index
+     * @return
+     */
+    public static boolean indexExits(String index) {
+        return EsQueryUtil.getClient().admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists();
+    }
+
+    /**
      * 2.获得QueryBuilder
-     * @date 2017年6月21日 上午11:53:04
-     * @param search Es查询实体类
-     * @param queryPage Es查询分页实体类
-     * @param boolQueryBuilder  EsQueryAction.getBoolQueryBuilder 返回值
+     *
+     * @param search           Es查询实体类
+     * @param queryPage        Es查询分页实体类
+     * @param boolQueryBuilder EsQueryAction.getBoolQueryBuilder 返回值
      * @return SearchRequestBuilder
+     * @date 2017年6月21日 上午11:53:04
      */
     public static SearchRequestBuilder getSearchRequestBuilder(EsSearch search, BasePage queryPage,
-            QueryBuilder boolQueryBuilder) {
+                                                               QueryBuilder boolQueryBuilder) {
         try {
             Set<String> indexsSet = new HashSet<>();
             Set<String> typesSet = new HashSet<>();
@@ -247,9 +258,10 @@ public class EsQueryAction {
 
     /**
      * 2.4设置使用Scroll方式查询
-     * @date 2017年6月21日 上午11:57:17
+     *
      * @param builder
      * @param millis
+     * @date 2017年6月21日 上午11:57:17
      */
     public static void addScroll(SearchRequestBuilder builder, long millis) {
         builder.setScroll(new Scroll(new TimeValue(millis)));
@@ -257,10 +269,11 @@ public class EsQueryAction {
 
     /**
      * 2.5获得Scroll查询Builder，第二次及以上Scroll查询时使用
-     * @date 2017年6月21日 上午11:54:39
-     * @param scrollId 上一次查询返回的scrollId
+     *
+     * @param scrollId  上一次查询返回的scrollId
      * @param timeValue 查询后数据保存时间
      * @return SearchScrollRequestBuilder
+     * @date 2017年6月21日 上午11:54:39
      */
     public static SearchScrollRequestBuilder getSearchScrollRequestBuilder(String scrollId, long timeValue) {
         try {
@@ -272,16 +285,17 @@ public class EsQueryAction {
 
     /**
      * 2.5多条件查询
-     * @date 2017年4月21日 下午4:51:26
+     *
      * @param search Es查询实体类
      * @return MultiSearchRequestBuilder
+     * @date 2017年4月21日 下午4:51:26
      */
     public static MultiSearchRequestBuilder getMultiSearchRequestBuilder(EsSearch search, BasePage queryPage,
-            BoolQueryBuilder boolQueryBuilder) {
+                                                                         BoolQueryBuilder boolQueryBuilder) {
         /*
          * if (search.getEsIndexs().size() == 1) throw new
          * RuntimeException("EsIndexEntity must more than 1");
-         * 
+         *
          * MultiSearchRequestBuilder multiSearchRequestBuilder =
          * EsQueryUtil.getClient().prepareMultiSearch(); for (EsIndexEntity
          * entity : search.getEsIndexs()) {
@@ -297,9 +311,10 @@ public class EsQueryAction {
 
     /**
      * 2.5聚合查询则增加所需参数
-     * @date 2017年6月21日 上午11:58:21
+     *
      * @param esAggregationSearch Es聚合查询实体类
-     * @param builder EsQueryAction.getBoolQueryBuilder 返回值
+     * @param builder             EsQueryAction.getBoolQueryBuilder 返回值
+     * @date 2017年6月21日 上午11:58:21
      * @since ES2.4.1
      */
     public static void addAggregation(EsAggregationSearch esAggregationSearch, SearchRequestBuilder builder) {
@@ -308,24 +323,18 @@ public class EsQueryAction {
                 builder.addSort(field, order);
             });
             TermsAggregationBuilder termsBuilder = AggregationBuilders.terms(TERMS_NAME).field(esAggregationSearch.getAggs().getField()).size(esAggregationSearch.getSize());
-            /*TermsBuilder termsBuilder = new TermsBuilder(TERMS_NAME).field(esAggregationSearch.getAggs().getField())
-                    .size(esAggregationSearch.getSize());*/
 
-            if (esAggregationSearch.getInline() != null) {
-                Script script = new Script(ScriptType.INLINE,esAggregationSearch.getInline(),  "expression", null);
-                new BucketSelectorPipelineAggregationBuilder("count_show", new QuickHashMap<String, String>().quickPut("count", "_count"),script);
-//                BucketSelectorBuilder bucketSelectorBuilder = new BucketSelectorBuilder("count_show")
-//                        .setBucketsPathsMap(new QuickHashMap<String, String>().quickPut("count", "_count"));
-//                Script script = new Script(esAggregationSearch.getInline(), ScriptType.INLINE, "expression", null);
-//                bucketSelectorBuilder.script(script);
-//                termsBuilder.subAggregation(bucketSelectorBuilder);
-            }
             AggregationBuilder aggrs = null;
             if (esAggregationSearch.getAggs().getType() != null) {
                 aggrs = new ChildrenAggregationBuilder(TERMS_NAME, esAggregationSearch.getAggs().getType());
                 aggrs.subAggregation(termsBuilder);
             } else {
                 aggrs = termsBuilder;
+            }
+            if (esAggregationSearch.getInline() != null) {
+                Script script = new Script(ScriptType.INLINE, esAggregationSearch.getInline(), "expression", null);
+                BucketSelectorPipelineAggregationBuilder bucketSelectorPipelineAggregationBuilder = new BucketSelectorPipelineAggregationBuilder("count_show", new QuickHashMap<String, String>().quickPut("count", "_count"), script);
+                aggrs.subAggregation(bucketSelectorPipelineAggregationBuilder);
             }
             builder.addAggregation(aggrs);
         } catch (Exception e) {
@@ -335,13 +344,14 @@ public class EsQueryAction {
 
     /**
      * 3.获得一般结果集
-     * @date 2017年6月21日 上午11:58:55
-     * @param builder EsQueryAction.getBoolQueryBuilder 返回值
+     *
+     * @param builder   EsQueryAction.getBoolQueryBuilder 返回值
      * @param queryPage Es查询分页实体类
      * @return EsResultEntity
+     * @date 2017年6月21日 上午11:58:55
      */
     public static EsResultEntity getSimpleEsResultEntity(ActionRequestBuilder<?, SearchResponse, ?> builder,
-            BasePage queryPage) {
+                                                         BasePage queryPage) {
         try {
             SearchResponse response = builder.get();
             log.info(builder.toString());
@@ -405,63 +415,27 @@ public class EsQueryAction {
 
     /**
      * 获得聚合结果集
-     * @date 2017年6月21日 上午11:59:24
-     * @param builder  EsQueryAction.getBoolQueryBuilder 必须先执行{ EsQueryAction.addAggregation
+     *
+     * @param builder   EsQueryAction.getBoolQueryBuilder 必须先执行{ EsQueryAction.addAggregation
      * @param queryPage Es查询分页实体类
-     * @param filters 聚合数量过滤器
+     * @param filters   聚合数量过滤器
      * @return EsResultEntity
+     * @date 2017年6月21日 上午11:59:24
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static EsResultEntity getAggregationEsResultEntity(ActionRequestBuilder<?, SearchResponse, ?> builder,
-            BasePage queryPage, EsCountFilter... filters) {
-        /*if (builder.toString().indexOf("aggregations") == -1 || builder.toString().indexOf(TERMS_NAME) == -1) {
-            throw new RuntimeException("must invoke this before addAggregation method");
-        }*/
+                                                              BasePage queryPage, EsCountFilter... filters) {
+        return getAggregationEsResultEntity(builder, queryPage, new InternalTermsResolver(), filters);
+    }
+
+    public static EsResultEntity getAggregationEsResultEntity(ActionRequestBuilder<?, SearchResponse, ?> builder,
+                                                              BasePage queryPage, AggsResolver aggsResolver, EsCountFilter... filters) {
         try {
             log.info(builder.toString());
             SearchResponse response = builder.get();
-            // 有序，从大->小
-            Map<String, Long> aggregationMap = new LinkedHashMap<>();
-            Aggregation aggregation = response.getAggregations().get(TERMS_NAME);
-            if (InternalChildren.class.isAssignableFrom(aggregation.getClass())) {
-                InternalChildren internalChildren = (InternalChildren) aggregation;
-                aggregation = internalChildren.getAggregations().get(TERMS_NAME);
-            }
-            InternalTerms internalTerms = (InternalTerms) aggregation;
-            List<Terms.Bucket> list = internalTerms.getBuckets();
-            list.forEach((Terms.Bucket bucket) -> {
-                if (filters != null) {
-                    for (EsCountFilter filter : filters) {
-                        if (filter != null) {
-                            if (filter.getGte() != null) {
-                                if (bucket.getDocCount() < filter.getGte())
-                                    return;
-                            } else if (filter.getGt() != null) {
-                                if (bucket.getDocCount() <= filter.getGt())
-                                    return;
-                            }
-                            if (filter.getLte() != null) {
-                                if (bucket.getDocCount() > filter.getLte())
-                                    return;
-                            } else if (filter.getLt() != null) {
-                                if (bucket.getDocCount() >= filter.getLt())
-                                    return;
-                            }
-                        }
-                    }
-                }
-
-                aggregationMap.put(bucket.getKey().toString(), bucket.getDocCount());
-            });
-
-            SearchHits hits = response.getHits();
-            List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-            hits.forEach((SearchHit searchHit) -> {
-                result.add(searchHit.getSource());
-            });
-            EsResultEntity esEntity = new EsResultEntity(result, hits.getTotalHits(), queryPage.getBeginNumber(),
-                    queryPage.getPageSize());
-            esEntity.setAggregationMap(aggregationMap);
+            EsResultEntity esEntity = aggsResolver.resolve(response, TERMS_NAME, filters);
+            esEntity.setBeginNumber(queryPage.getBeginNumber());
+            esEntity.setPageSize(queryPage.getPageSize());
             return esEntity.setScrollId(response.getScrollId());
         } catch (Exception e) {
             throw new EsSearchException(e);
@@ -470,13 +444,14 @@ public class EsQueryAction {
 
     /**
      * 获得属性结果集
-     * @date 2017年6月21日 下午12:00:55
-     * @param builder EsQueryAction.getBoolQueryBuilder
+     *
+     * @param builder   EsQueryAction.getBoolQueryBuilder
      * @param queryPage Es查询分页实体类
      * @return EsResultEntity
+     * @date 2017年6月21日 下午12:00:55
      */
     public static EsResultEntity getFieldEsResultEntity(ActionRequestBuilder<?, SearchResponse, ?> builder,
-            BasePage queryPage) {
+                                                        BasePage queryPage) {
         try {
             SearchResponse response = builder.get();
             SearchHits hits = response.getHits();

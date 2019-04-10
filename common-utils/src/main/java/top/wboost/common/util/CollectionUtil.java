@@ -40,15 +40,48 @@ public class CollectionUtil {
         return map == null || map.size() == 0;
     }
 
-    public static <T> List<List<T>> splitCollection(List<T> calculateResultList, Class<T> clazz, int splitNum) {
+    /**
+     * 根据总段数分割集合
+     *
+     * @param calculateResultList
+     * @param clazz
+     * @param splitNum            总段数
+     * @param <T>
+     * @return
+     */
+    public static <T> List<List<T>> splitCollectionBySplitNum(Collection<T> calculateResultList, Class<T> clazz, int splitNum) {
         List<List<T>> calculateApiResults = new ArrayList<>();
         int once = calculateResultList.size() / (splitNum - 1);
         if (once == 0) {
-            calculateApiResults.add(calculateResultList);
+            calculateApiResults.add(new ArrayList<>(calculateResultList));
         } else {
             int now = 0;
             while (now <= calculateResultList.size()) {
-                calculateApiResults.add(calculateResultList.subList(now, now + once > calculateResultList.size() ? calculateResultList.size() : now + once));
+                calculateApiResults.add(new ArrayList<>(calculateResultList).subList(now, now + once > calculateResultList.size() ? calculateResultList.size() : now + once));
+                now += once;
+            }
+        }
+        return calculateApiResults;
+    }
+
+    /**
+     * 根据总集合数分割集合
+     *
+     * @param calculateResultList
+     * @param clazz
+     * @param oneCollectionNum    单个集合最大个数
+     * @param <T>
+     * @return
+     */
+    public static <T> List<List<T>> splitCollectionByNum(Collection<T> calculateResultList, Class<T> clazz, int oneCollectionNum) {
+        List<List<T>> calculateApiResults = new ArrayList<>();
+        int once = oneCollectionNum;
+        if (calculateResultList.size() <= oneCollectionNum) {
+            calculateApiResults.add(new ArrayList<>(calculateResultList));
+        } else {
+            int now = 0;
+            while (now <= calculateResultList.size()) {
+                calculateApiResults.add(new ArrayList<>(calculateResultList).subList(now, now + once > calculateResultList.size() ? calculateResultList.size() : now + once));
                 now += once;
             }
         }

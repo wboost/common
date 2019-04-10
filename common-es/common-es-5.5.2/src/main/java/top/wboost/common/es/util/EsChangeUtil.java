@@ -1,5 +1,6 @@
 package top.wboost.common.es.util;
 
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.client.Requests;
@@ -34,9 +35,15 @@ public class EsChangeUtil extends AbstractEsUtil {
         try {
             Settings settings = Settings.builder().put("number_of_shards", index.getNumber_of_shards())
                     .put("number_of_replicas", index.getNumber_of_replicas()).build();
-            client.admin().indices().prepareCreate(index.getFirstIndex()).setSettings(settings).execute().actionGet();
+            if (index.getSettingSupport() != null) {
+                index.getSettingSupport().invoke(settings);
+            }
+            CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices().prepareCreate(index.getFirstIndex()).setSettings(settings);
+            if (index.getBuilderSupport() != null) {
+                index.getBuilderSupport().invoke(createIndexRequestBuilder);
+            }
+            createIndexRequestBuilder.execute().actionGet();
             log.debug(index.getProperties().string());
-            System.out.println(index.getProperties().string());
             PutMappingRequest mappingRequest = Requests.putMappingRequest(index.getFirstIndex())
                     .type(index.getFirstType()).source(index.getProperties());
             return client.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
@@ -45,6 +52,7 @@ public class EsChangeUtil extends AbstractEsUtil {
         }
         return false;
     }
+
 
     /**
      * 新增数据

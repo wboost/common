@@ -89,7 +89,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
         });
     }
 
-    public static StandardServletEnvironment environment;
+    public static Environment environment;
 
     private PropertySourcesPlaceholderConfigurer configPropertySourcesPlaceholderConfigurer(
             ConfigurableListableBeanFactory beanFactory) {
@@ -186,7 +186,7 @@ public class ConfigProperties implements /* BeanDefinitionRegistryPostProcessor 
 
     @Override
     public void setEnvironment(Environment environment) {
-        this.environment = (StandardServletEnvironment) environment;
+        this.environment = environment;
     }
 
     @Override
