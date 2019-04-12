@@ -6,7 +6,7 @@
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
     <name>common</name>
-    <version>3.2.2-SNAPSHOT</version>
+    <version>4.0.0.RELEASE</version>
     <description>project auto plugins</description>
     <url>http://www.wboost.top</url>
     <developers>
@@ -31,30 +31,23 @@
     </scm>
     <modules>
         <module>common-base</module>
-        <!--<module>common-core</module>-->
         <module>common-log</module>
         <module>common-utils</module>
         <module>common-exception</module>
         <module>common-utils-web</module>
         <module>common-context</module>
         <module>common-web</module>
-        <module>common-cache</module>
         <module>common-distributed</module>
-        <module>common-message-queue</module>
-        <module>common-es</module>
         <module>common-sql</module>
-        <module>common-kylin</module>
-        <module>common-kylin-support-repository</module>
         <module>common-boost</module>
         <module>common-boot</module>
-        <module>common-netty</module>
     </modules>
 
     <properties>
 
         <!-- project -->
         <project-group-id>top.wboost</project-group-id>
-        <project-group-version>3.2.2-SNAPSHOT</project-group-version>
+        <project-group-version>4.0.0.RELEASE</project-group-version>
         <!-- /project -->
 
         <!-- config -->
@@ -133,32 +126,7 @@
             </dependency>
             <dependency>
                 <groupId>${project-group-id}</groupId>
-                <artifactId>common-cache</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
                 <artifactId>common-distributed</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-es-2</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-es-5</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-kylin</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-kylin-support-repository</artifactId>
                 <version>${project-group-version}</version>
             </dependency>
             <dependency>
@@ -173,22 +141,7 @@
             </dependency>
             <dependency>
                 <groupId>${project-group-id}</groupId>
-                <artifactId>common-netty</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-message-queue-base</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
                 <artifactId>common-sql</artifactId>
-                <version>${project-group-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project-group-id}</groupId>
-                <artifactId>common-message-queue-redis</artifactId>
                 <version>${project-group-version}</version>
             </dependency>
 

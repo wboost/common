@@ -4,7 +4,7 @@
     <parent>
         <groupId>top.wboost</groupId>
         <artifactId>common</artifactId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>4.0.0.RELEASE</version>
     </parent>
     <artifactId>common-context</artifactId>
     <properties>
