@@ -6,7 +6,7 @@
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
     <name>common</name>
-    <version>4.0.0.RELEASE</version>
+    <version>4.0.1-SNAPSHOT</version>
     <description>project auto plugins</description>
     <url>http://www.wboost.top</url>
     <developers>
@@ -26,8 +26,7 @@
     <scm>
         <connection>scm:git:git@github.com:wboost/common.git</connection>
         <developerConnection>scm:git:git@github.com:wboost/common.git</developerConnection>
-        <url>https://github.com/wboost/common</url>
-        <tag>common</tag>
+        <url>git@github.com:wboost/common</url>
     </scm>
     <modules>
         <module>common-base</module>
@@ -47,7 +46,7 @@
 
         <!-- project -->
         <project-group-id>top.wboost</project-group-id>
-        <project-group-version>4.0.0.RELEASE</project-group-version>
+        <project-group-version>4.0.1-SNAPSHOT</project-group-version>
         <!-- /project -->
 
         <!-- config -->
@@ -420,12 +419,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>${org.apache.maven.plugins.version}</version>
-            </plugin>-->
-
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
@@ -445,6 +438,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
             </plugin>
         </plugins>
 
