@@ -444,7 +444,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                    <tagNameFormat>v4.0.1-SNAPSHOT</tagNameFormat>
+                    <scmCommentPrefix>[release]</scmCommentPrefix>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
