@@ -37,7 +37,7 @@ import static top.wboost.common.compiler.CompilerUtils.*;
 @SuppressWarnings("StaticNonFinalField")
 public class CachedCompiler implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(CachedCompiler.class);
-    private static final PrintWriter DEFAULT_WRITER = new PrintWriter(System.err);
+    public static final PrintWriter DEFAULT_WRITER = new PrintWriter(System.err);
 
     private final Map<ClassLoader, Map<String, Class>> loadedClassesMap = Collections.synchronizedMap(new WeakHashMap<ClassLoader, Map<String, Class>>());
     private final Map<ClassLoader, MyJavaFileManager> fileManagerMap = Collections.synchronizedMap(new WeakHashMap<ClassLoader, MyJavaFileManager>());
@@ -64,13 +64,13 @@ public class CachedCompiler implements Closeable {
     }
 
     public Class loadFromJava(String className, String javaCode) throws ClassNotFoundException {
-        return loadFromJava(getClass().getClassLoader(), className, javaCode, DEFAULT_WRITER);
+        return loadFromJava(getClass().getClassLoader(), className, javaCode);
     }
 
     public Class loadFromJava(ClassLoader classLoader,
                               String className,
                               String javaCode) throws ClassNotFoundException {
-        return loadFromJava(classLoader, className, javaCode, DEFAULT_WRITER);
+        return loadFromJava(classLoader, className, javaCode, DEFAULT_WRITER,null);
     }
 
 
@@ -83,6 +83,13 @@ public class CachedCompiler implements Closeable {
                                         String javaCode,
                                         final PrintWriter writer,
                                         MyJavaFileManager fileManager) {
+        return compileFromJava(className, javaCode, writer, fileManager, null);
+    }
+
+    Map<String, byte[]> compileFromJava(String className,
+                                        String javaCode,
+                                        final PrintWriter writer,
+                                        MyJavaFileManager fileManager, Iterable<String> options) {
         Iterable<? extends JavaFileObject> compilationUnits;
         if (sourceDir != null) {
             String filename = className.replaceAll("\\.", '\\' + File.separator) + ".java";
@@ -95,14 +102,12 @@ public class CachedCompiler implements Closeable {
             compilationUnits = javaFileObjects.values();
         }
         // reuse the same file manager to allow caching of jar files
-        boolean ok = s_compiler.getTask(writer, fileManager, new DiagnosticListener<JavaFileObject>() {
-            @Override
-            public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-                if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
-                    writer.println(diagnostic);
-                }
+        boolean ok = s_compiler.getTask(writer, fileManager, diagnostic -> {
+            //if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
+            if (diagnostic.getKind() != null) {
+                writer.println(diagnostic);
             }
-        }, null, null, compilationUnits).call();
+        }, options, null, compilationUnits).call();
         Map<String, byte[]> result = fileManager.getAllBuffers();
         if (!ok) {
             // compilation error, so we want to exclude this file from future compilation passes
@@ -118,7 +123,7 @@ public class CachedCompiler implements Closeable {
     public Class loadFromJava(ClassLoader classLoader,
                               String className,
                               String javaCode,
-                              PrintWriter writer) throws ClassNotFoundException {
+                              PrintWriter writer, Iterable<String> options) throws ClassNotFoundException {
         Class clazz = null;
         Map<String, Class> loadedClasses;
         synchronized (loadedClassesMap) {
@@ -137,7 +142,7 @@ public class CachedCompiler implements Closeable {
             StandardJavaFileManager standardJavaFileManager = s_compiler.getStandardFileManager(null, null, null);
             fileManagerMap.put(classLoader, fileManager = new MyJavaFileManager(standardJavaFileManager, classLoader));
         }
-        for (Map.Entry<String, byte[]> entry : compileFromJava(className, javaCode, printWriter, fileManager).entrySet()) {
+        for (Map.Entry<String, byte[]> entry : compileFromJava(className, javaCode, printWriter, fileManager,options).entrySet()) {
             String className2 = entry.getKey();
             synchronized (loadedClassesMap) {
                 if (loadedClasses.containsKey(className2))

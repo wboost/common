@@ -27,6 +27,21 @@ public class ResultEntityTemplate<T> {
         }
     }
 
+    public static ResultEntityTemplate resolve(ResponseEntity<String> checkResponse, Class<?> data) {
+        if (checkResponse.getStatusCode() == HttpStatus.OK) {
+            return resolve(checkResponse.getBody(), data);
+        } else {
+            throw new RuntimeException(checkResponse.toString());
+        }
+    }
+
+    public static ResultEntityTemplate resolve(String checkResponse, Class<?> data) {
+        ResultEntityTemplate resultEntityTemplate = JSONObject.parseObject(checkResponse, ResultEntityTemplate.class);
+        Object o = JSONObject.parseObject(JSONObject.toJSONString(resultEntityTemplate.getData()), data);
+        resultEntityTemplate.setData(o);
+        return resultEntityTemplate;
+    }
+
     public boolean success() {
         return status == 0 && (validate == null || validate);
     }
