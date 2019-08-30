@@ -3,7 +3,7 @@
     <parent>
         <groupId>top.wboost</groupId>
         <artifactId>common</artifactId>
-        <version>4.0.1.RELEASE</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
     <artifactId>common-log</artifactId>
     <properties>
