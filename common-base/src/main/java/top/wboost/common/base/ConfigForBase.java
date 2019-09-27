@@ -2,19 +2,11 @@ package top.wboost.common.base;
 
 public class ConfigForBase {
 
-    public interface PropertiesConfig {
-        // 是否开发者模式(部分common日志/返回数据包含)
-        public final String IS_DEBUG = "common.dev.debug";
-        // 展示sql
-        public final String SHOW_SQL = "common.dev.show-sql";
-    }
+    /**
+     * 默认BeanNameGenerator
+     **/
+    public static final String BEAN_NAME_GENERATOR_CLASS = "top.wboost.common.context.generator.ConfigAnnotationBeanNameGenerator";
 
-
-    public interface SCAN_CONFIG {
-        public final String WEB = "#web";
-        public final String ROOT = "#root";
-        public final String BOOT = "#boot";
-    }
 
     public enum BasePackage {
         WBOOST("top.wboost.common"), CHINAOLY("com.chinaoly");
@@ -35,8 +27,20 @@ public class ConfigForBase {
 
     }
 
-    /** 默认BeanNameGenerator **/
-    public static final String BEAN_NAME_GENERATOR_CLASS = "top.wboost.common.context.generator.ConfigAnnotationBeanNameGenerator";
+    public interface PropertiesConfig {
+        // 是否开发者模式(部分common日志/返回数据包含)
+        public final String IS_DEBUG = "common.dev.debug";
+        // 处理异常返回码
+        public final String EXCEPTION_STATUS = "common.config.exception.status";
+        // 展示sql
+        public final String SHOW_SQL = "common.dev.show-sql";
+    }
+
+    public interface SCAN_CONFIG {
+        public final String WEB = "#web";
+        public final String ROOT = "#root";
+        public final String BOOT = "#boot";
+    }
 
 }
 

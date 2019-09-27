@@ -24,37 +24,38 @@ import java.util.List;
  */
 public abstract class CompilerRunBoostHandler implements BoostHandler {
 
+    private static final Logger LOGGER = LoggerUtil.getLogger(CompilerRunBoostHandler.class);
     static String methodGen = "public Object call() throws Exception {[run]}";
-
     static Object jarLauncher;
     static Object archives;
     static Method createClassLoader;
-    private static final Logger LOGGER = LoggerUtil.getLogger(CompilerRunBoostHandler.class);
-
-    static {
-        try {
-            jarLauncher = CompilerRunBoostHandler.class.getClassLoader().loadClass("org.springframework.boot.loader.JarLauncher").newInstance();
-            Method getClassPathArchives = ReflectUtil.findMethod(jarLauncher.getClass(), "getClassPathArchives");
-            getClassPathArchives.setAccessible(true);
-            archives = getClassPathArchives.invoke(jarLauncher);
-            createClassLoader = ReflectUtil.findMethod(jarLauncher.getClass(), "createClassLoader", List.class);
-            createClassLoader.setAccessible(true);
-        } catch (Exception e) {
-            LOGGER.warn("CompilerRunBoostHandler init error! Not a SpringBoot Application? ", e);
-        }
-    }
 
     public static ClassLoader createClassLoader() throws Exception {
         return (ClassLoader) createClassLoader.invoke(jarLauncher, archives);
     }
 
     public static Object compiler(String code) throws Exception {
-        return compiler(code, createClassLoader());
-    }
-
-    public static Object compiler(String code,ClassLoader classLoader) throws Exception {
         String cname = "RuntimeCompiler" + RandomUtil.getUuid();
-        ClassPool.getDefault().appendClassPath(new SpringBootClassPath());
+        boolean is_boot_app = false;
+        try {
+            Class.forName("org.springframework.boot.loader.archive.Archive");
+            is_boot_app = true;
+        } catch (Exception e) {
+            // ignore
+        }
+        if (is_boot_app) {
+            try {
+                jarLauncher = CompilerRunBoostHandler.class.getClassLoader().loadClass("org.springframework.boot.loader.JarLauncher").newInstance();
+                Method getClassPathArchives = ReflectUtil.findMethod(jarLauncher.getClass(), "getClassPathArchives");
+                getClassPathArchives.setAccessible(true);
+                archives = getClassPathArchives.invoke(jarLauncher);
+                createClassLoader = ReflectUtil.findMethod(jarLauncher.getClass(), "createClassLoader", List.class);
+                createClassLoader.setAccessible(true);
+                ClassPool.getDefault().appendClassPath(new SpringBootClassPath());
+            } catch (Exception e) {
+                LOGGER.warn("CompilerRunBoostHandler init error! Not a SpringBoot Application? ", e);
+            }
+        }
         CtClass ctClass = ClassPool.getDefault().get(CompilerTestClass.class.getName());
         ctClass.setName(cname);
         CtMethod make = CtNewMethod.make(methodGen.replace("[run]", code), ctClass);

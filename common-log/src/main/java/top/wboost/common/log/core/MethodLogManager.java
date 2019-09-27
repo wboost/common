@@ -24,7 +24,7 @@ public class MethodLogManager implements LogManager<MethodLog>, ApplicationListe
 
     private Logger log = LoggerUtil.getLogger(getClass());
 
-    private ExecutorService sendLogService = Executors.newFixedThreadPool(5,
+    private ExecutorService sendLogService = Executors.newFixedThreadPool(2,
             ExecutorsDaemon.getDaemonThreadFactory("methodLogManagerPool"));
 
     @Override

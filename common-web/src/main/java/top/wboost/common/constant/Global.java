@@ -3,6 +3,7 @@
  */
 package top.wboost.common.constant;
 
+import org.springframework.http.HttpStatus;
 import top.wboost.common.base.ConfigForBase;
 import top.wboost.common.utils.web.utils.PropertiesUtil;
 
@@ -24,6 +25,8 @@ public class Global {
 
     public final static boolean ISDEBUG = Boolean
             .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.IS_DEBUG));
+
+    public final static HttpStatus EXCEPTION_STATUS = HttpStatus.valueOf(Integer.parseInt(PropertiesUtil.getPropertyOrDefault(ConfigForBase.PropertiesConfig.EXCEPTION_STATUS, "500")));
 
     public final static boolean SHOWSQL = Boolean
             .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.SHOW_SQL));

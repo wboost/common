@@ -6,13 +6,13 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import top.wboost.common.annotation.Explain;
 import top.wboost.common.base.annotation.AutoWebApplicationConfig;
 import top.wboost.common.base.entity.ResultEntity;
+import top.wboost.common.constant.Global;
 import top.wboost.common.context.annotation.ResourceConfig;
 import top.wboost.common.exception.AbstractBaseCodeException;
 import top.wboost.common.exception.BaseException;
@@ -88,7 +88,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(Global.EXCEPTION_STATUS.value());
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(throwable.getSystemCode())
                             .setPromptMessage(throwable.getPromptMessage()).setThrowable(throwable).build()));
@@ -99,7 +99,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(Global.EXCEPTION_STATUS.value());
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity
                             .fail(throwable.getBusinessCode() == CodeMessageManager.NO_MESSAGE_CODE
@@ -112,7 +112,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(Global.EXCEPTION_STATUS.value());
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(SystemCode.FAIL).setThrowable(throwable).build()));
         } catch (Exception throwable) {
@@ -120,7 +120,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
             log.error("Exception : {} ", methodLog.toString(), throwable);
             logManager.sendLog(methodLog);
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(Global.EXCEPTION_STATUS.value());
             HtmlUtil.writerJson(response, ResponseUtil
                     .codeResolveJson(ResultEntity.fail(methodLog.getExceptionCode()).setThrowable(throwable).build()));
         } catch (Throwable throwable) {
@@ -128,7 +128,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
             log.error("Throwable : {}", throwable);
             logManager.sendLog(methodLog);
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(Global.EXCEPTION_STATUS.value());
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(SystemCode.ERROR).setThrowable(throwable).build()));
         }

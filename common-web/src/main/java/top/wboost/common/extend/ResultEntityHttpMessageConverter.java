@@ -1,9 +1,5 @@
 package top.wboost.common.extend;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Objects;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
@@ -12,12 +8,16 @@ import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.util.StreamUtils;
-
 import top.wboost.common.base.annotation.AutoWebApplicationConfig;
 import top.wboost.common.base.entity.ResultEntity;
 import top.wboost.common.base.enums.CharsetEnum;
+import top.wboost.common.constant.Global;
 import top.wboost.common.util.ResponseUtil;
 import top.wboost.common.utils.web.utils.HtmlUtil;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * ResultEntity返回转换器
@@ -67,7 +67,7 @@ public class ResultEntityHttpMessageConverter extends AbstractHttpMessageConvert
         if (t != null) {
             result = ResponseUtil.codeResolveJson(t);
             if (t.getStatus() == 1) {
-                Objects.requireNonNull(HtmlUtil.getResponse()).setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                Objects.requireNonNull(HtmlUtil.getResponse()).setStatus(Global.EXCEPTION_STATUS.value());
             } else if (t.getValidate() != null && !t.getValidate()) {
                 Objects.requireNonNull(HtmlUtil.getResponse()).setStatus(HttpStatus.UNAUTHORIZED.value());
             }
