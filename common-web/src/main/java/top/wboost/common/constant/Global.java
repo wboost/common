@@ -26,7 +26,7 @@ public class Global {
     public final static boolean ISDEBUG = Boolean
             .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.IS_DEBUG));
 
-    public final static HttpStatus EXCEPTION_STATUS = HttpStatus.valueOf(Integer.parseInt(PropertiesUtil.getPropertyOrDefault(ConfigForBase.PropertiesConfig.EXCEPTION_STATUS, "500")));
+    public final static HttpStatus EXCEPTION_STATUS = HttpStatus.valueOf(Integer.parseInt(PropertiesUtil.getPropertyOrDefault(ConfigForBase.PropertiesConfig.EXCEPTION_STATUS, ConfigForBase.PropertiesConfig.DEFAULT_EXCEPTION_STATUS + "")));
 
     public final static boolean SHOWSQL = Boolean
             .parseBoolean(PropertiesUtil.getProperty(ConfigForBase.PropertiesConfig.SHOW_SQL));

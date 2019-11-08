@@ -64,13 +64,21 @@ public class ResultEntityHttpMessageConverter extends AbstractHttpMessageConvert
             throws IOException, HttpMessageNotWritableException {
         Charset charset = getContentTypeCharset(outputMessage.getHeaders().getContentType());
         String result = null;
+        boolean status = true;
         if (t != null) {
             result = ResponseUtil.codeResolveJson(t);
             if (t.getStatus() == 1) {
                 Objects.requireNonNull(HtmlUtil.getResponse()).setStatus(Global.EXCEPTION_STATUS.value());
+                status = false;
             } else if (t.getValidate() != null && !t.getValidate()) {
                 Objects.requireNonNull(HtmlUtil.getResponse()).setStatus(HttpStatus.UNAUTHORIZED.value());
+                status = false;
             }
+        }
+        if (status) {
+            Objects.requireNonNull(HtmlUtil.getResponse()).addHeader("status", "0");
+        } else {
+            Objects.requireNonNull(HtmlUtil.getResponse()).addHeader("status", "1");
         }
         StreamUtils.copy(result, charset, outputMessage.getBody());
     }

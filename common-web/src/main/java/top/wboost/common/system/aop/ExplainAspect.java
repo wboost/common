@@ -88,7 +88,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(Global.EXCEPTION_STATUS.value());
+            errorMsg(response);
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(throwable.getSystemCode())
                             .setPromptMessage(throwable.getPromptMessage()).setThrowable(throwable).build()));
@@ -99,7 +99,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(Global.EXCEPTION_STATUS.value());
+            errorMsg(response);
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity
                             .fail(throwable.getBusinessCode() == CodeMessageManager.NO_MESSAGE_CODE
@@ -112,7 +112,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
                 logManager.sendLog(methodLog);
             }
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(Global.EXCEPTION_STATUS.value());
+            errorMsg(response);
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(SystemCode.FAIL).setThrowable(throwable).build()));
         } catch (Exception throwable) {
@@ -120,7 +120,7 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
             log.error("Exception : {} ", methodLog.toString(), throwable);
             logManager.sendLog(methodLog);
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(Global.EXCEPTION_STATUS.value());
+            errorMsg(response);
             HtmlUtil.writerJson(response, ResponseUtil
                     .codeResolveJson(ResultEntity.fail(methodLog.getExceptionCode()).setThrowable(throwable).build()));
         } catch (Throwable throwable) {
@@ -128,11 +128,16 @@ public class ExplainAspect implements Ordered, EzWebApplicationListener {
             log.error("Throwable : {}", throwable);
             logManager.sendLog(methodLog);
             HttpServletResponse response = HtmlUtil.getResponse();
-            response.setStatus(Global.EXCEPTION_STATUS.value());
+            errorMsg(response);
             HtmlUtil.writerJson(response,
                     ResponseUtil.codeResolveJson(ResultEntity.fail(SystemCode.ERROR).setThrowable(throwable).build()));
         }
         return null;
+    }
+
+    public void errorMsg(HttpServletResponse response) {
+        response.setStatus(Global.EXCEPTION_STATUS.value());
+        response.addHeader("status", "1");
     }
 
     /**

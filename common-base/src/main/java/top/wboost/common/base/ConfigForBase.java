@@ -32,6 +32,7 @@ public class ConfigForBase {
         public final String IS_DEBUG = "common.dev.debug";
         // 处理异常返回码
         public final String EXCEPTION_STATUS = "common.config.exception.status";
+        public final int DEFAULT_EXCEPTION_STATUS = 200;
         // 展示sql
         public final String SHOW_SQL = "common.dev.show-sql";
     }
