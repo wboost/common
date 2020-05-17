@@ -1,0 +1,300 @@
+package com.chinaoly.cdmp.dev.process.core;
+
+import com.chinaoly.cdmp.dev.command.Command;
+import com.chinaoly.cdmp.dev.command.ExecCommand;
+import com.chinaoly.cdmp.dev.command.ReadCommand;
+import com.chinaoly.cdmp.dev.core.Extend;
+import com.chinaoly.cdmp.dev.job.JobOption;
+import com.chinaoly.cdmp.dev.process.core.classloader.LaunchedURLClassLoader;
+import com.chinaoly.cdmp.dev.process.core.classloader.archive.JarFileArchive;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.type.filter.AbstractTypeHierarchyTraversingFilter;
+import top.wboost.common.util.StringUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * 指令加载器(当前支持依赖包内的类)
+ * + CommandLoader
+ * - ReadCommandLoader
+ * - ExecCommandLoader
+ *
+ * @Auther: jwsun
+ * @Date: 2019/8/5 10:50
+ */
+@Slf4j
+public class CommandLoader {
+
+    // 外部插件包文件夹
+    static File pluginDir = new File("plugins");
+    // 自身包中插件
+    Map<String, CommandCache> selfCommands = new HashMap<>();
+    // 外部插件
+    Map<String, CommandCache> pluginCommands = new HashMap<>();
+    // 扫描到的文件
+    Set<String> scannerFile = new HashSet<>();
+    // 插件所在包前缀
+    private String pkg;
+    // 扫描接口全路径(com.chinaoly.cdmp.dev.command.ExecCommand/com.chinaoly.cdmp.dev.command.ReadCommand)
+    private String matchInterface;
+    // 扫描接口具体类型(ExecCommand/ReadCommand)
+    private String nameSuffix;
+    // 参数注入提供者
+    private InjectableProvider injectableProvider;
+    // 类扫描结果提供者
+    private ClassPathScanningCandidateComponentProvider classPathScanningCandidateComponentProvider;
+
+    public CommandLoader(String pkg, String matchInterface, InjectableProvider injectableProvider) {
+        // 初始化各属性并加载内部与外部插件
+        this.pkg = pkg;
+        this.injectableProvider = injectableProvider;
+        this.matchInterface = matchInterface;
+        this.classPathScanningCandidateComponentProvider = new ClassPathScanningCandidateComponentProvider(false);
+        classPathScanningCandidateComponentProvider.addIncludeFilter(new AbstractTypeHierarchyTraversingFilter(false, true) {
+            protected Boolean matchInterface(String interfaceName) {
+                return matchInterface.equals(interfaceName);
+            }
+
+            protected boolean matchClassName(String className) {
+                return className.endsWith(matchInterface.substring(matchInterface.lastIndexOf(".")));
+            }
+        });
+        this.nameSuffix = this.matchInterface.substring(this.matchInterface.lastIndexOf(".") + 1);
+        loadSelf();
+        loadPlugin();
+        // 启动文件监听
+        try {
+            new PluginFileListener(this).startMonitor(pluginDir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 加载自带command
+     */
+    private void loadSelf() {
+        scanner().forEach(name -> {
+            log.info("扫描到的类有: {}", name);
+            String type = name.substring(name.lastIndexOf(".") + 1, name.length() - nameSuffix.length());
+            CommandCache commandCache = new CommandCache();
+            commandCache.setClassLoader(this.classPathScanningCandidateComponentProvider.getResourceLoader().getClassLoader());
+            commandCache.setCommand(name);
+            this.selfCommands.put(type.toLowerCase(), commandCache);
+        });
+    }
+
+    /**
+     * 加载外部插件command
+     */
+    private void loadPlugin() {
+        if (pluginDir.exists() && pluginDir.isDirectory()) {
+            loadPluginsByFiles(Objects.requireNonNull(pluginDir.listFiles()));
+        }
+    }
+
+    /**
+     * 加载外部URL插件command
+     */
+    private Map<String, CommandCache> loadUrl(String url) throws MalformedURLException {
+        ClassPathScanningCandidateComponentProvider classPathScanningCandidateComponentProvider = new ClassPathScanningCandidateComponentProvider(false);
+        classPathScanningCandidateComponentProvider.addIncludeFilter(new AbstractTypeHierarchyTraversingFilter(false, true) {
+            protected Boolean matchInterface(String interfaceName) {
+                return matchInterface.equals(interfaceName);
+            }
+
+            protected boolean matchClassName(String className) {
+                return className.endsWith(matchInterface.substring(matchInterface.lastIndexOf(".")));
+            }
+        });
+        String nameSuffix = matchInterface.substring(matchInterface.lastIndexOf(".") + 1);
+        URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL(url)});
+        classPathScanningCandidateComponentProvider.setResourceLoader(new DefaultResourceLoader(urlClassLoader));
+        Map<String, CommandCache> commandCacheMap = new HashMap<>();
+        classPathScanningCandidateComponentProvider.findCandidateComponents(this.pkg).stream().map(BeanDefinition::getBeanClassName).collect(Collectors.toSet()).forEach(name -> {
+            String type = name.substring(name.lastIndexOf(".") + 1, name.length() - nameSuffix.length());
+            CommandCache commandCache = generatorCommandCache(urlClassLoader, name);
+            commandCacheMap.put(type.toLowerCase(), commandCache);
+            log.info("load plugin type:{}, info:{} ", type.toLowerCase(), commandCache);
+        });
+        return commandCacheMap;
+    }
+
+    private CommandCache generatorCommandCache(ClassLoader classLoader, String name) {
+        CommandCache commandCache = new CommandCache();
+        commandCache.setClassLoader(classLoader);
+        commandCache.setCommand(name);
+        return commandCache;
+    }
+
+    // 从文件JAR加载插件
+    protected void loadPluginsByFiles(File[] files) {
+        List<JarFileArchive> archives = new ArrayList<>();
+        Arrays.stream(files).peek(file -> this.scannerFile.add(file.getAbsolutePath())).filter(file -> file.getName().contains("-plugin.jar")).forEach(file -> {
+            log.info("try load plugin: " + file.getName());
+            try {
+                JarFileArchive entries = new JarFileArchive(file);
+                archives.add(entries);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.warn("load plugin error!: " + file.getName());
+            }
+        });
+        archives.forEach(this::loadPluginByArchives);
+    }
+
+    // 从JAR档案包内加载插件
+    protected void loadPluginByArchives(JarFileArchive archive) {
+        try {
+            LaunchedURLClassLoader launchedURLClassLoader = new LaunchedURLClassLoader(new URL[]{archive.getUrl()}, Thread.currentThread().getContextClassLoader());
+            this.classPathScanningCandidateComponentProvider.setResourceLoader(new DefaultResourceLoader(launchedURLClassLoader));
+            scanner().forEach(name -> {
+                String type = name.substring(name.lastIndexOf(".") + 1, name.length() - nameSuffix.length());
+                CommandCache commandCache = new CommandCache();
+                commandCache.setClassLoader(classPathScanningCandidateComponentProvider.getResourceLoader().getClassLoader());
+                commandCache.setCommand(name);
+                this.pluginCommands.put(type.toLowerCase(), commandCache);
+                log.info("load plugin type:{}, info:{} ", type.toLowerCase(), commandCache);
+            });
+            log.info("load plugin success.: " + archive.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            log.warn("load plugin error!: " + archive.toString());
+        }
+    }
+
+    public Map<String, CommandCache> getSelfCommands() {
+        return selfCommands;
+    }
+
+    public Map<String, CommandCache> getPluginCommands() {
+        return pluginCommands;
+    }
+
+    // 扫描符合条件的类
+    public Set<String> scanner() {
+        return this.classPathScanningCandidateComponentProvider.findCandidateComponents(this.pkg).stream().map(BeanDefinition::getBeanClassName).collect(Collectors.toSet());
+    }
+
+    /**
+     * 获得指令类
+     *
+     * @param type 类型
+     * @return command class
+     */
+    public CommandCache getCommandClass(String type) {
+        CommandCache commandCache = this.selfCommands.get(type);
+        if (commandCache == null) {
+            commandCache = this.pluginCommands.get(type);
+        }
+        return commandCache;
+    }
+
+    /**
+     * <pre>
+     * 获得插件
+     * 优先级 外部URL插件>内部文件夹插件>内置代码插件
+     * </pre>
+     *
+     * @param jobOption 插件类型
+     * @return {@link com.chinaoly.cdmp.dev.command.Command}
+     * @throws ClassNotFoundException 类加载异常
+     * @throws InstantiationException 类实例化异常
+     */
+    Command getCommandByType(JobOption jobOption) throws ClassNotFoundException, InstantiationException {
+        String type = jobOption.getType();
+        CommandCache commandCache = null;
+        // 如果有外部插件设置
+        if (jobOption.getExtend() != null) {
+            Extend.ExtendPlugin pluginByType = jobOption.getExtend().getPluginByType(jobOption.getType());
+            if (pluginByType != null) {
+                String url = pluginByType.getUrl();
+                if (StringUtil.notEmpty(url)) {
+                    try {
+                        Map<String, CommandCache> commandCacheMap = loadUrl(url);
+                        commandCache = commandCacheMap.get(type);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new ClassNotFoundException("类型:" + type + ",url:" + url + ",load by url error.", e);
+                    }
+                }
+            }
+        }
+        if (commandCache == null) {
+            commandCache = getCommandClass(type);
+        }
+
+        log.debug("期望的job类型{},实际的job类型{}", type, commandCache);
+        Command command = null;
+        if (commandCache == null) {
+            throw new ClassNotFoundException("类型:" + type + ",未找到对应读指令");
+        } else {
+            Class<?> commandClass = null;
+            try {
+                commandClass = commandCache.loadClass();
+            } catch (ClassNotFoundException e) {
+                throw new ClassNotFoundException("类型:" + type + ",获得读指令类型:" + commandClass + ",加载类失败");
+            }
+            try {
+                command = (Command) commandClass.newInstance();
+                injectableProvider.inject(command);
+                command.init(jobOption);
+            } catch (Exception e) {
+                throw new InstantiationException("类型:" + type + ",获得读指令类型:" + commandClass + ",实例化类失败");
+            }
+        }
+        return command;
+    }
+
+    // 插件缓存
+    @Data
+    static class CommandCache {
+        // 插件类路径
+        String command;
+        // 独立类加载器
+        ClassLoader classLoader;
+
+        Class loadClass() throws ClassNotFoundException {
+            return this.classLoader.loadClass(command);
+        }
+    }
+
+    /**
+     * 读插件加载器
+     */
+    public static class ReadCommandLoader extends CommandLoader {
+
+        public ReadCommandLoader(String pkg, InjectableProvider injectableProvider) {
+            super(pkg, ReadCommand.class.getName(), injectableProvider);
+        }
+
+        public ReadCommand getCommand(JobOption jobOption) throws ClassNotFoundException, InstantiationException {
+            return (ReadCommand) getCommandByType(jobOption);
+        }
+    }
+
+    /**
+     * 执行插件加载器
+     */
+    public static class ExecCommandLoader extends CommandLoader {
+
+        public ExecCommandLoader(String pkg, InjectableProvider injectableProvider) {
+            super(pkg, ExecCommand.class.getName(), injectableProvider);
+        }
+
+        public ExecCommand getCommand(JobOption jobOption) throws ClassNotFoundException, InstantiationException {
+            return (ExecCommand) getCommandByType(jobOption);
+        }
+    }
+
+}

@@ -1,5 +1,13 @@
 package top.wboost.common.system.code;
 
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import top.wboost.common.base.core.ExecutorsDaemon;
+import top.wboost.common.log.entity.Logger;
+import top.wboost.common.log.util.LoggerUtil;
+import top.wboost.common.util.StringUtil;
+import top.wboost.common.utils.web.utils.PropertiesUtil;
+
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -8,40 +16,27 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-
-import top.wboost.common.base.core.ExecutorsDaemon;
-import top.wboost.common.log.entity.Logger;
-import top.wboost.common.log.util.LoggerUtil;
-import top.wboost.common.util.StringUtil;
-import top.wboost.common.utils.web.utils.PropertiesUtil;
-
 /**
  * 返回码对应信息管理器
- * @className CodeMessageManager
+ *
  * @author jwSun
- * @date 2017年8月1日 下午4:35:52
  * @version 1.0.0
+ * @className CodeMessageManager
+ * @date 2017年8月1日 下午4:35:52
  */
 public class CodeMessageManager implements ApplicationListener<ContextClosedEvent> {
 
-    private static Logger log = LoggerUtil.getLogger(CodeMessageManager.class);
-
-    private final static String systemMessagePath = "classpath*:sys/properties/system-message-code_zh_CN.properties";
-    private final String messagePath;
-    private final String fileName;
-    private final String language;
-    private String realMessagePath;
     //不需要加载说明
     public static final int NO_MESSAGE_CODE = 0;
+    private final static String systemMessagePath = "classpath*:sys/properties/system-message-code_zh_CN.properties";
     //默认重新读取配置文件时间(分钟)
     private static final long defaultLoadTime = 30;
-    /**更新配置文件信息定时器**/
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1,
-            ExecutorsDaemon.getDaemonThreadFactory("codeMessageManagerPool"));
-
-    /**key:code,value:message**/
+    // 匹配{}
+    private static final String PATTERN_COMPILE = "\\{(.*?)\\}";
+    private static Logger log = LoggerUtil.getLogger(CodeMessageManager.class);
+    /**
+     * key:code,value:message
+     **/
     private static ConcurrentHashMap<Integer, String> codeMessageMap = new ConcurrentHashMap<Integer, String>();
 
     static {
@@ -52,6 +47,16 @@ public class CodeMessageManager implements ApplicationListener<ContextClosedEven
         }
         log.debug("init system code and message end");
     }
+
+    private final String messagePath;
+    private final String fileName;
+    private final String language;
+    private String realMessagePath;
+    /**
+     * 更新配置文件信息定时器
+     **/
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1,
+            ExecutorsDaemon.getDaemonThreadFactory("codeMessageManagerPool"));
 
     public CodeMessageManager(String messagePath, String fileName) {
         this(messagePath, fileName, "zh_CN", defaultLoadTime);
@@ -74,25 +79,6 @@ public class CodeMessageManager implements ApplicationListener<ContextClosedEven
                 loadMessage();
             }
         }, 0, loadTime, TimeUnit.MINUTES);
-    }
-
-    /**
-     * 读取配置文件信息
-     */
-    private void loadMessage() {
-        log.debug("init code and message...");
-        Properties messageProperties = PropertiesUtil.loadProperties(this.realMessagePath);
-        for (Entry<Object, Object> businessCode : messageProperties.entrySet()) {
-            try {
-                Integer code = Integer.valueOf((String) businessCode.getKey());
-                String message = (String) businessCode.getValue();
-                codeMessageMap.put(code, message == null ? "" : message);
-            } catch (Exception e) {
-                log.error("key : {},value: {} ,error is : {}", businessCode.getKey(), businessCode.getValue(),
-                        e.getLocalizedMessage());
-            }
-        }
-        log.debug("init code and message end...");
     }
 
     public static void loadMessageByPath(String path) {
@@ -125,9 +111,10 @@ public class CodeMessageManager implements ApplicationListener<ContextClosedEven
 
     /**
      * 根据返回码获得详细提示信息
-     * @param code 代码
+     *
+     * @param code    代码
      * @param message 提示信息
-     * @param params 提示信息,可在配置文件中以{index}保存
+     * @param params  提示信息,可在配置文件中以{index}保存
      * @return
      */
     public static String getDetailMessageByCodeOrDefault(int code, String message, Object... params) {
@@ -143,28 +130,46 @@ public class CodeMessageManager implements ApplicationListener<ContextClosedEven
         return "code : " + code + ",code message is : " + getMessageByCode(code, params);
     }
 
-    // 匹配{}
-    private static final String PATTERN_COMPILE = "\\{(.*?)\\}";
-
     private static String replaceMessage(String message, Object... params) {
         if (message == null)
             return message;
-        try {
-            Object[] replaceParams = params;
-            List<String> replaceList = StringUtil.getPatternMattcherList(message, PATTERN_COMPILE, 1);
-            for (String replaceIndex : replaceList) {
+
+        Object[] replaceParams = params;
+        List<String> replaceList = StringUtil.getPatternMattcherList(message, PATTERN_COMPILE, 1);
+        for (String replaceIndex : replaceList) {
+            try {
                 int index = Integer.parseInt(replaceIndex);
                 if (replaceParams != null && index < replaceParams.length && index >= 0) {
-                    message = message.replaceAll("\\{" + index + "\\}", replaceParams[index].toString());
+                    message = message.replace("{" + index + "}", replaceParams[index].toString());
                 } else {
-                    message = message.replaceAll("\\{" + index + "\\}", "");
+                    message = message.replace("{" + index + "}", "");
                 }
+            } catch (Exception e) {
+                if (log.isDebugEnabled())
+                    log.debug(" replace message error ,{}", e.getLocalizedMessage());
             }
-        } catch (Exception e) {
-            log.error(" replace message error ,{}", e.getLocalizedMessage());
         }
         return message.trim();
 
+    }
+
+    /**
+     * 读取配置文件信息
+     */
+    private void loadMessage() {
+        log.debug("init code and message...");
+        Properties messageProperties = PropertiesUtil.loadProperties(this.realMessagePath);
+        for (Entry<Object, Object> businessCode : messageProperties.entrySet()) {
+            try {
+                Integer code = Integer.valueOf((String) businessCode.getKey());
+                String message = (String) businessCode.getValue();
+                codeMessageMap.put(code, message == null ? "" : message);
+            } catch (Exception e) {
+                log.error("key : {},value: {} ,error is : {}", businessCode.getKey(), businessCode.getValue(),
+                        e.getLocalizedMessage());
+            }
+        }
+        log.debug("init code and message end...");
     }
 
     public String getSystemMessagePath() {
