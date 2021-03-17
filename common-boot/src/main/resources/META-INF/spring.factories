@@ -1,3 +1,5 @@
 # Add Application Context Initializers by jwsun
 org.springframework.context.ApplicationContextInitializer=\
 top.wboost.common.boot.config.ConfigForCommonBootApplicationContextInitializer
+org.springframework.boot.SpringApplicationRunListener=\
+top.wboost.common.boot.config.FrameworkSpringApplicationRunListener
