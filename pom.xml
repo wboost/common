@@ -74,7 +74,7 @@
         <!-- common -->
         <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-lang.version>2.4</commons-lang.version>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <org.apache.poi.version>3.9</org.apache.poi.version>
         <!-- /common -->
     </properties>
